@@ -14,14 +14,14 @@
 
 <div id="responseMsg"></div>
 <script>
-/*
+
 var xhr = new XMLHttpRequest();
-xhr.open('GET', '/gsonAlbums');
+xhr.open('GET', '/userByID');
 xhr.onload = function(evt) {
    if (xhr.status === 200) {
-   		document.getElementById('albumlist').innerHTML = xhr.responseText;
+   		document.getElementById('userDisplay').innerHTML = xhr.responseText;
         var response = JSON.parse(xhr.responseText);
-        document.getElementById('oneAlbum').innerHTML = response[0].genre;
+        document.getElementById('parsedUserDisplay').innerHTML = response.handle;
         
         // at this point, could:
         	// get a list container by ID (like an unordered list)
@@ -37,7 +37,11 @@ xhr.onload = function(evt) {
     }
 };
 xhr.send();
-*/
+
 </script>
+<h1>unparsed user</h1>
+<div id="userDisplay"></div>
+<h1>parsed user > handle</h1>
+<div id="parsedUserDisplay"></div>
 </body>
 </html>
