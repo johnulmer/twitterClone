@@ -13,7 +13,7 @@ public class TwitterRouter {
         port(3000);
         //AlbumList albumList = new AlbumList();
 
-//        get("/album/:id", (req, res) -> {
+//        get("/album/:id", (req, 0res) -> {
 //            System.out.println("request made");
 //            System.out.println(req.queryParams("b"));
 //            return "hi world2";
@@ -37,6 +37,31 @@ public class TwitterRouter {
             User u = User.GetUserByUserID(3);
             System.out.println(u);
             return gson.toJson(u);
+
+//        get("/userByID", (req, res) -> {
+//            Gson gson = new Gson();
+//            User u = User.GetUserByUserID(3);
+//            System.out.println(u);
+//            return gson.toJson(u);
+        });
+        
+        get("/insertTweet", (request, response) -> {
+        	Tweet insertTweet = new Tweet();
+        	insertTweet.connect();
+        	insertTweet.insert(6,"insert tweet testing6",6666,"");        	
+	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/login.jtwig");
+	        JtwigModel model = JtwigModel.newModel();
+	        return template.render(model);
+        });
+        
+        
+        get("/getTweet", (request, response) -> {
+        	Tweet getTweet = new Tweet();
+        	getTweet.connect();
+        	System.out.println(getTweet.get(1));
+	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/login.jtwig");
+	        JtwigModel model = JtwigModel.newModel();
+	        return template.render(model);
         });
         
 /*        
