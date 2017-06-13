@@ -25,6 +25,13 @@ public class TwitterRouter {
 	        return template.render(model);
         });
         
+        get("/userByID", (req, res) -> {
+            Gson gson = new Gson();
+            User u = User.GetUserByUserID(3);
+            System.out.println(u);
+            return gson.toJson(u);
+        });
+        
 /*        
         
         get("/album/:id", (request, response) -> {
