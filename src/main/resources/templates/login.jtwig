@@ -3,7 +3,16 @@
 <head>
 </head>
 <body>
-<h1>made it to login</h1>
+<h1>Please log in to TwitterClone&trade;</h1>
+<label id="lblUserName">User Name: </label><input type="text" id="txtUserName"></input>
+<label id="lblPassword">Password: </label><input type="password" id="txtPassword"></input>
+<label id="lblHandle" style="visibility:hidden">Handle: </label><input type="hidden" id="txtHandle"></input>
+<button type="button" id="btnLogin">Log In</button>
+<p style="font:italic">No account?  Please <a href="">register</a></p>
+
+
+
+<div id="responseMsg"></div>
 <script>
 /*
 var xhr = new XMLHttpRequest();
