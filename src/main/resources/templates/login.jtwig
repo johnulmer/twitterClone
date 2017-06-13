@@ -3,45 +3,83 @@
 <head>
 </head>
 <body>
-<h1>Please log in to TwitterClone&trade;</h1>
-<label id="lblUserName">User Name: </label><input type="text" id="txtUserName"></input>
-<label id="lblPassword">Password: </label><input type="password" id="txtPassword"></input>
-<label id="lblHandle" style="visibility:hidden">Handle: </label><input type="hidden" id="txtHandle"></input>
-<button type="button" id="btnLogin">Log In</button>
-<p style="font:italic">No account?  Please <a href="">register</a></p>
+	<h1>Please log in to TwitterClone&trade;</h1>
+	<table><tr><td>
+		<label id="lblUserName">User Name: </label><input type="text" id="txtUserName"></input><br/>
+		<label id="lblPassword">Password: </label><input type="password" id="txtPassword"></input><br/>
+		<div id="divHandle" style="display: none;"><label id="lblHandle">Handle: </label><input type="text" id="txtHandle"></input></div></td>
+		<td><button id="btnLogin">Log In</button>
+			<div id="divRegister">No account?  Please <button id="btnRegister">Register!</button></div>
+			<div id="divCompleteRegistration" style="display: none;"><button id="btnCompleteRegistration">Join</button> the maddening crowd!</td>
+			</tr>
+			<tr><td colspan="2"><div id="responseMsg"></div></td>
+			</tr>
+		</table>
+		<script>
+
+		btnLogin = document.getElementById("btnLogin");
+		btnRegister = document.getElementById("btnRegister");
+		btnCompleteRegistration = document.getElementById("btnCompleteRegistration");
+		txtUserName = document.getElementById("txtUserName");
+		txtPassword = document.getElementById("txtPassword");
+		lblHandle = document.getElementById("lblHandle");
+		txtHandle = document.getElementById("txtHandle");
+		divResponseMsg = document.getElementById("responseMsg");
+		divRegister = document.getElementById("divRegister");
+		divCompleteRegistration = document.getElementById("divCompleteRegistration");
+		divHandle = document.getElementById("divHandle");
+
+		//use for debugging
+		divUserDisplay = document.getElementById('userDisplay');
+		divPUDisplay = document.getElementById('parsedUserDisplay');
+
+		btnLogin.addEventListener('click', function (evt) {
+			// call UserAuthenticate
+			divResponseMsg.innerHTML = txtUserName.value + txtPassword.value;
+		})
+		btnRegister.addEventListener('click', function (evt) {
+			divHandle.style.display="block";
+			divCompleteRegistration.style.display="block";
+			// call UserAuthenticate
+			divResponseMsg.innerHTML = txtUserName.value + txtPassword.value;
+		})
+		btnCompleteRegistration.addEventListener('click', function (evt) {
+			divResponseMsg.innerHTML = txtUserName.value + txtPassword.value + txtHandle.value;
+		})
+
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', '/userByID');
+		xhr.onload = function(evt) {
+			if (xhr.status === 200) {
+				divUserDisplay.innerHTML = xhr.responseText;
+				var response = JSON.parse(xhr.responseText);
+				divPUDisplay.innerHTML = response.handle;
+
+				// at this point, could:
+				// get a list container by ID (like an unordered list)
+				// loop through array
+				// for each, create a new <li>
+				// set the innerHTML to the value for the title, artist, etc
+				//  append that li to the UL
+
+				console.log("should show size:  " + response.length());
+				console.log("should show contents:  " + response);
+			} else {
+				alert('Request failed.  Returned status of ' + xhr.status);
+			}
+		};
+		xhr.send();
 
 
 
-<div id="responseMsg"></div>
-<script>
 
-var xhr = new XMLHttpRequest();
-xhr.open('GET', '/userByID');
-xhr.onload = function(evt) {
-   if (xhr.status === 200) {
-   		document.getElementById('userDisplay').innerHTML = xhr.responseText;
-        var response = JSON.parse(xhr.responseText);
-        document.getElementById('parsedUserDisplay').innerHTML = response.handle;
-        
-        // at this point, could:
-        	// get a list container by ID (like an unordered list)
-        	// loop through array
-        	// for each, create a new <li>
-        	// set the innerHTML to the value for the title, artist, etc
-        	//  append that li to the UL
-        	
-        console.log("should show size:  " + response.length());
-        console.log("should show contents:  " + response);
-    } else {
-        alert('Request failed.  Returned status of ' + xhr.status);
-    }
-};
-xhr.send();
 
-</script>
-<h1>unparsed user</h1>
-<div id="userDisplay"></div>
-<h1>parsed user > handle</h1>
-<div id="parsedUserDisplay"></div>
-</body>
-</html>
+
+		</script>
+		<h1>debugging UI</h1>
+		<h2>unparsed user</h2>
+		<div id="userDisplay"></div>
+		<h2>parsed user, just the user handle</h2>
+		<div id="parsedUserDisplay"></div>
+		</body>
+		</html>

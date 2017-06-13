@@ -25,6 +25,13 @@ public class TwitterRouter {
 	        return template.render(model);
         });
         
+        get("/authenticate", (request, response) -> {
+        	Gson gson = new Gson();
+        	int UserID = User.Authenticate("user1", "pwd1");
+        	System.out.println("found user: " + UserID);
+        	return gson.toJson((Integer) UserID);
+        });
+        
         get("/userByID", (req, res) -> {
             Gson gson = new Gson();
             User u = User.GetUserByUserID(3);

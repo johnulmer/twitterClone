@@ -72,6 +72,26 @@ public class User {
 		System.out.println("reading user");
 		return u;
 	}
+	// Authenticate user based on userName and password
+	public static int Authenticate(String userName, String password) {
+		User u = new User();
+		int userID = -1;
+		String sqlString = "SELECT UserID FROM Users WHERE UserName = " + userName + " AND Password = " + password;
+        try (Connection conn = u.connect();
+                Statement stmt  = conn.createStatement();
+                ResultSet rs    = stmt.executeQuery(sqlString)){
+               
+               // loop through the result set
+               while (rs.next()) {
+            	   userID = rs.getInt("UserID");
+               }
+               System.out.println("found ID: " + userID);
+           } catch (SQLException e) {
+               System.out.println(e.getMessage());
+           }
+		System.out.println("reading user");
+		return userID;
+	}
 	
     private Connection connect() {
         // SQLite connection string
