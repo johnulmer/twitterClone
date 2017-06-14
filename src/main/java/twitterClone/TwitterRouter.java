@@ -1,48 +1,62 @@
 package twitterClone;
 
-import static spark.Spark.get;
-import static spark.Spark.port;
+
+import static spark.Spark.*;
 import java.util.ArrayList;
 import org.jtwig.JtwigModel;
 import org.jtwig.JtwigTemplate;
 import com.google.gson.Gson;
 
 public class TwitterRouter {
+	
+	private static String Register(spark.Request request, spark.Response response) {
+        String username = request.queryParams("username");
+        String password = request.queryParams("password");
+        String handle = request.queryParams("handle");
+        String registration = User.Register(username, password, handle);
+        if (registration.equals("SUCCESS")) {
+	        request.session().attribute("userID", User.GetUserByUserName(username));
+	        request.session().attribute("username", username);
+	        request.session().attribute("handle", handle);
+        }
+    	return registration;
+	}
+	
+	private static String Authenticate(spark.Request request, spark.Response response) {
+        String username = request.queryParams("username");
+        String password = request.queryParams("password");
+    	int UserID = User.Authenticate(username, password);
+    	if (UserID > -1) {
+	        request.session().attribute("userID", Integer.toString(UserID));
+	        request.session().attribute("username", username);
+    		return "SUCCESS";
+    	} else {
+    		return "Unable to authenticate - please try again or register if you are a new user.";
+    	}
+	}
 
     public static void main(String[] args) {
-        port(3000);
-        //AlbumList albumList = new AlbumList();
+        port(3003);
 
-//        get("/album/:id", (req, 0res) -> {
-//            System.out.println("request made");
-//            System.out.println(req.queryParams("b"));
-//            return "hi world2";
-//        });
         get("/login", (request, response) -> {
 	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/login.jtwig");
 	        JtwigModel model = JtwigModel.newModel();
-	        //JtwigModel model = JtwigModel.newModel().with("albums", albumList.albums);
 	        return template.render(model);
+        });        
+ 
+        post("/authenticate", (request, response) -> {
+        	return TwitterRouter.Authenticate(request, response);
         });
         
-        get("/authenticate", (request, response) -> {
-        	Gson gson = new Gson();
-        	int UserID = User.Authenticate("user1", "pwd1");
-        	System.out.println("found user: " + UserID);
-        	return gson.toJson((Integer) UserID);
+        post("/register", (request, response) -> {
+        	return TwitterRouter.Register(request, response);
         });
         
-        get("/userByID", (req, res) -> {
-            Gson gson = new Gson();
-            User u = User.GetUserByUserID(3);
-            System.out.println(u);
-            return gson.toJson(u);
-
-//        get("/userByID", (req, res) -> {
-//            Gson gson = new Gson();
-//            User u = User.GetUserByUserID(3);
-//            System.out.println(u);
-//            return gson.toJson(u);
+        get("/userUpdate", (request, response) -> {
+        	User u = new User("users name", "pass word", "this is a handle");
+	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/userUpdate.jtwig");
+	        JtwigModel model = JtwigModel.newModel().with("user", u);
+	        return template.render(model);
         });
         
         get("/insertTweet", (request, response) -> {
@@ -63,28 +77,5 @@ public class TwitterRouter {
 	        JtwigModel model = JtwigModel.newModel();
 	        return template.render(model);
         });
-        
-/*        
-        
-        get("/album/:id", (request, response) -> {
-            Album album = albumList.getAlbum(Integer.parseInt(request.params(":id")));
-            if (album == null){
-                return "Album was not found.";
-            }
-            return ("Hello: "+album.title+" "+album.artist+" "+album.genre);
-        });
-
-        get("/addAlbum/:title/:artist/:genre", (request, response) -> {
-            int newID = albumList.addAlbum(request.params(":title"), request.params(":artist"), request.params(":genre"));
-            return (newID);
-        });
-        
-
-        
-        get("/gsonAlbums", (req, res) -> {
-            Gson gson = new Gson();
-            System.out.println(gson.toJson(albumList.albums));
-            return gson.toJson(albumList.albums);
-        });*/
 }
 }

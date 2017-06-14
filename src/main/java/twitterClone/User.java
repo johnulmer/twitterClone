@@ -43,12 +43,68 @@ public class User {
 	}
 	
 	// Read user from DB by userName
-	public static User GetUserByUserName(String userName) {
-		User u = new User(userName, "test password", "test handle");
-		u.userID = 0; // will read from DB, hard-coded for now
-		System.out.println("reading user");
-		return u;
+	public static int GetUserByUserName(String userName) {
+		int userID = -1;
+		User u = new User();
+		String sqlString = "SELECT UserID FROM Users WHERE UserName = '" + userName + "'";
+		System.out.println(sqlString);
+        try (Connection conn = u.connect();
+                Statement stmt  = conn.createStatement();
+                ResultSet rs    = stmt.executeQuery(sqlString)){
+               while (rs.next()) {
+            	   userID = rs.getInt("UserID");
+               }
+           } catch (SQLException e) {
+               System.out.println(e.getMessage());
+           }
+		return userID;
 	}
+	// Read user from DB by userName
+	public static int GetUserByHandle(String handle) {
+		int userID = -1;
+		User u = new User();
+		String sqlString = "SELECT UserID FROM Users WHERE Handle = '" + handle + "'";
+		System.out.println(sqlString);
+        try (Connection conn = u.connect();
+                Statement stmt  = conn.createStatement();
+                ResultSet rs    = stmt.executeQuery(sqlString)){
+               while (rs.next()) {
+            	   userID = rs.getInt("UserID");
+               }
+           } catch (SQLException e) {
+               System.out.println(e.getMessage());
+           }
+		return userID;
+	}
+	// Register new user if neither username nor handle are in use
+	public static String Register(String userName, String password, String handle) {
+		String returnString = "";
+		if (User.GetUserByHandle(handle) != -1) {
+			returnString = "Handle exists, you are a copycat.";
+		} else if (User.GetUserByUserName(userName) != -1) {
+			returnString = "Sandra Bullock opposes your identity theft - try a different User Name.";
+		} else {
+			ProcessRegistration(userName, password, handle);
+			returnString = "SUCCESS";
+		}
+		return returnString;
+	}
+	
+	public static void ProcessRegistration(String userName, String password, String handle) {
+		User u = new User();
+		String sqlString = "INSERT INTO Users (UserName, Password, Handle) VALUES " +
+				"('" + userName + "',  '" + password + "', '" + handle + "')";
+		System.out.println(sqlString);
+        try (Connection conn = u.connect();
+                Statement stmt  = conn.createStatement();
+                ResultSet rs    = stmt.executeQuery(sqlString)){
+        		//System.out.println("working");
+           } catch (SQLException e) {
+               System.out.println(e.getMessage());
+           }
+		//System.out.println("reading user");
+	}
+	
 	// Read user from DB by userID
 	public static User GetUserByUserID(int userID) {
 		
@@ -76,7 +132,8 @@ public class User {
 	public static int Authenticate(String userName, String password) {
 		User u = new User();
 		int userID = -1;
-		String sqlString = "SELECT UserID FROM Users WHERE UserName = " + userName + " AND Password = " + password;
+		String sqlString = "SELECT UserID FROM Users WHERE UserName = '" + userName + "' AND Password = '" + password + "'";
+		System.out.println(sqlString);
         try (Connection conn = u.connect();
                 Statement stmt  = conn.createStatement();
                 ResultSet rs    = stmt.executeQuery(sqlString)){
