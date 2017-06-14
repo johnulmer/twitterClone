@@ -3,38 +3,28 @@
 <head>
 </head>
 <body>
-	<h1>Please log in to TwitterClone&trade;</h1>
+	<h1>Today I shall assume a new identity <i>TwitterClone&trade;!</i></h1>
 	<table><tr><td>
-		<label id="lblUserName">User Name: </label><input type="text" id="txtUserName"></input><br/>
-		<label id="lblPassword">Password: </label><input type="password" id="txtPassword"></input><br/>
-		<div id="divHandle" style="display: none;"><label id="lblHandle">Handle: </label><input type="text" id="txtHandle"></input></div></td>
-		<td><div id="divLogin"><button id="btnLogin">Log In</button></div>
-			<div id="divRegister">No account?  Please <button id="btnRegister">Register!</button></div>
-			<div id="divCompleteRegistration" style="display: none;"><button id="btnCompleteRegistration">Join</button> the maddening crowd!</td>
+		<label id="lblUserName">User Name: </label><div id="divUserName">{{user.getUserName()}}</div><br/>
+		<label id="lblPassword">Password: </label><input type="text" id="txtPassword">{{user.getPassword()}}</input><br/>
+		<label id="lblHandle">Handle: </label><input type="text" id="txtHandle">{{user.getHandle()}}</input></td>
+		<td><button id="btnUpdate">Update</button> handle or password.</td>
 			</tr>
 			<tr><td colspan="2"><div id="responseMsg"></div></td>
-			</tr>
 		</table>
 		<script>
 
 		// attach code to UI elements
-		btnLogin = document.getElementById("btnLogin");
-		btnRegister = document.getElementById("btnRegister");
-		btnCompleteRegistration = document.getElementById("btnCompleteRegistration");
-		txtUserName = document.getElementById("txtUserName");
+		btnUpdate = document.getElementById("btnUpdate");
+		divUserName = document.getElementById("divUserName");
 		txtPassword = document.getElementById("txtPassword");
-		lblHandle = document.getElementById("lblHandle");
 		txtHandle = document.getElementById("txtHandle");
 		divResponseMsg = document.getElementById("responseMsg");
-		divRegister = document.getElementById("divRegister");
-		divCompleteRegistration = document.getElementById("divCompleteRegistration");
-		divHandle = document.getElementById("divHandle");
-		divLogin = document.getElementById("divLogin");
 
 //get login form data, send to authenticate method
-		btnLogin.addEventListener('click', function (evt) {
+		btnUpdate.addEventListener('click', function (evt) {
 			var xhr = new XMLHttpRequest();
-			xhr.open('POST', '/authenticate');
+			xhr.open('POST', '/update');
 			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 			xhr.onload = function() {
 					if (xhr.status === 200) {
@@ -48,9 +38,9 @@
 							alert('Request failed.  Returned status of ' + xhr.status);
 					}
 			};
-			var username = txtUserName.value;
+			var handle = txtHandle.value;
 			var password = txtPassword.value;
-			var body = 'username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password);
+			var body = 'handle=' + encodeURIComponent(handle) + '&password=' + encodeURIComponent(password);
 			console.log(body);
 			xhr.send(body);
 		});
