@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+
+  <h2>Tweet</h2>
+  <input type="text" name="message" size="140">
+    <script type="text/javascript">
+//==============================================================================
+//CODE PUZZLE-1: sum an array of numbers
+  function arraysum (arrinput) {
+    var sum = 0;
+    for (i=0;i<arrinput.length;i++) {
+      if (isNaN(arrinput[i])) {
+        return "Array has a non number entry";
+        }
+      else {
+        sum= arrinput[i]+sum;
+        }
+    }
+  return sum;
+  }
+  console.log(arraysum([-10,-20,30,-10000])); //test case-1 expected output is -10000
+  console.log(arraysum([-10,-20,30, 0.001])); //test case-2 expected output is 0.001
+  console.log(arraysum([-.003,1])); //test case-3 expected output is .997
+  console.log(arraysum([-10000,30000,-10000])); //test case-4 expected output is 10000
+//==============================================================================
+// CODE PUZZLE-2: - sum of increments
+  // function suminc (start,end,incr) {
+  //   var sum = 0;
+  //   for (i=start;i<end;i=i+incr) {
+  //     sum= sum + i;
+  //   }
+  // return sum;
+  // }
+  // console.log(suminc(3,14,4)); //test case-1: expected output is 21
+  // console.log(suminc(3,21,4)); //test case-2: expected output is 55
+//==============================================================================
+//CODE PUZZLE-3: mix and max values of an array
+  // var minindx = 0;
+  // var maxindx = 0;
+  // function arrayminmax (Arr) {
+  //   var mini = Arr[0];
+  //   var max  = Arr[0];
+  //   for (i=0;i<Arr.length;i++) {
+  //       if (Arr[i] < mini) {
+  //           mini = Arr[i];
+  //           minindx = i;
+  //       } else if (Arr[i] > max ){
+  //           max = Arr[i];
+  //           maxindx = i;
+  //       }
+  //   }
+  //   return minindx,maxindx;
+  // }
+  // var sum = arrayminmax ([2,10,2]);
+  // console.log("Min index is",minindx, "Max index is",maxindx); //test case-1 expected out put is min 0, max 1
+//==============================================================================
+//CODE PUZZLE-4: Repeat a string
+  // function RepStr (str,integ) {
+  //   var concact = "";
+  //   for (var i=0;i<integ;i++) {
+  //       concact = concact + str;
+  //   }
+  //   return concact;
+  // }
+  // console.log("Concatenated String is",RepStr("repeat",10));
+//==============================================================================
+//CODE PUZZLE-5: find the factors of an integer
+// var Arr = [];
+// Arr[0] = " "
+// function IntFact (integ) {
+//   var rem = 0;
+//   var index = 0;
+//   for (var i=2;i<integ;i++){
+//     rem = integ % i;
+//     if (rem == 0) {
+//       Arr[index]= i;
+//       index++
+//     }
+//   }
+// return Arr;
+// }
+// console.log("Factors of the integer are",IntFact(18));
+//==============================================================================
+//CODE PUZZLE-6: random number within a range
+// var z = 0;
+// function findRandom (x,y) {
+//   z = (x + (Math.random()*((y+1)-x)));
+//   var result = ("Random number between " + x + " and " + y + " is " + Math.floor(z) );
+//   return result;
+// }
+//  console.log(findRandom(10,20));
+//==============================================================================
+//CODE PUZZLE-7: RANDOM ELEMENT FROM AN ARRAY
+// var Array = [40,30,10,20,50];
+// function findRandomArray (Array) {
+//   var ArrayMaxIndex = Array.length;
+//   RandomIndex = (0.01 + (Math.random()*(ArrayMaxIndex-0.01)));
+//   return "Ramdom array value for the array [" + Array + "] is " + Array[Math.floor(RandomIndex)];
+// }
+// console.log(findRandomArray(Array));
+//==============================================================================
+//CODE PUZZLE-8: COUNT OCCURENCES OF CHAR IN A STRING"
+// var string = ("Rubber baby buggy bumper"); //input1
+// var char = ("r") //input2
+// function countOccurence(x,char) {
+//   var count = 0;
+//   for (i=0;i<x.length;i++) {
+//     if (x.charAt(i) == char) {
+//       count++;
+//       }
+//   }
+//   return count;
+// }
+// console.log("Number of occurences of '" +char+ "' in string '" + string + "' is ",countOccurence(string,char));
+//==============================================================================
+//CODE PUZZLE-9: PALINDROMES"
+// function palindrome (y)  {
+//   x = y.toUpperCase();
+//   var r = Math.floor(x.length);
+//   for (l = 0; l <= ((x.length/2)-1); l++) {
+//       if (x.charAt(l)===x.charAt(r-1)) {
+//           r--;
+//       } else {
+//         return ("'" +y+"'" + " is not a palindrome");
+//       }
+//   }
+// return ("'" +y+"'" + " is a palindrome");
+// }
+// console.log(palindrome("ABCCBA"));
+// console.log(palindrome("%good doog%"));
+// console.log(palindrome("f"));
+// console.log(palindrome(" "));
+// console.log(palindrome("RaceCar"));
+// console.log(palindrome("Test"));
+//==============================================================================
+//CODE PUZZLE-10: title case
+// function titlecase ()  {
+//   var upperflag = "y";
+//   var z ="";
+//   var str="";
+//   var i =0;
+//   for (var j = 0; j < arguments[i].length; j++) {
+//     if (arguments[i][j]!==" " && upperflag==="y") {
+//         z=arguments[i][j].toUpperCase();
+//         str = str + z;
+//         upperflag="n";
+//     }
+//     else if (arguments[i][j]==" ") {
+//       str = str + arguments[i][j];
+//       upperflag="y";
+//     } else {
+//       str = str + arguments[i][j];
+//     }
+//   } return str;
+//   }
+// console.log(titlecase("i am going to GFC"));
+//==============================================================================
+
+
+    </script>
+  </body>
+</html>

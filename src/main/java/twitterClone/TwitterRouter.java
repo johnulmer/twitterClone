@@ -1,6 +1,7 @@
 package twitterClone;
 
 import static spark.Spark.get;
+import static spark.Spark.post;
 import static spark.Spark.port;
 import java.util.ArrayList;
 import org.jtwig.JtwigModel;
@@ -37,54 +38,68 @@ public class TwitterRouter {
             User u = User.GetUserByUserID(3);
             System.out.println(u);
             return gson.toJson(u);
-
-//        get("/userByID", (req, res) -> {
-//            Gson gson = new Gson();
-//            User u = User.GetUserByUserID(3);
-//            System.out.println(u);
-//            return gson.toJson(u);
         });
+
         
+        //this is for inserting tweet into DB. 
         get("/insertTweet", (request, response) -> {
-        	Tweet insertTweet = new Tweet();
-        	insertTweet.connect();
-        	insertTweet.insert(6,"insert tweet testing6",6666,"");        	
-	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/login.jtwig");
+	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/enterTweet.jtwig");
 	        JtwigModel model = JtwigModel.newModel();
 	        return template.render(model);
         });
         
+        post("/insertTweet", (req, res) -> {
+        	System.out.print("/insertTweet post req 1 ");
+            String first = req.queryParams("tweetMessage");
+            System.out.print("/insertTweet post req 2 ");
+            try {
+            	Tweet insertTweet = new Tweet();
+            	insertTweet.connect();
+            	insertTweet.insert(12,first,1,"");     
+            	System.out.print("/insertTweet post req 3 ");
+                return "success";
+            } catch (NumberFormatException ex) {
+                System.out.println("bad input");
+            }
+            System.out.print("/insertTweet post req 4 ");
+            return "failure";
+        });
         
-        get("/getTweet", (request, response) -> {
+        //request to get your own tweets
+        get("/getOwnTweet", (request, response) -> {
         	Tweet getTweet = new Tweet();
         	getTweet.connect();
-        	System.out.println(getTweet.get(1));
+        	System.out.println(getTweet.get(1,"self"));  
+	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/login.jtwig");
+	        JtwigModel model = JtwigModel.newModel();
+	        return template.render(model);
+        });
+
+        //request to get own tweet + followers tweet        	
+        get("/getMainTweet", (request, response) -> {
+        	Tweet getTweet = new Tweet();
+        	getTweet.connect();
+        	System.out.println(getTweet.get(1,"main"));
 	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/login.jtwig");
 	        JtwigModel model = JtwigModel.newModel();
 	        return template.render(model);
         });
         
-/*        
-        
-        get("/album/:id", (request, response) -> {
-            Album album = albumList.getAlbum(Integer.parseInt(request.params(":id")));
-            if (album == null){
-                return "Album was not found.";
-            }
-            return ("Hello: "+album.title+" "+album.artist+" "+album.genre);
-        });
-
-        get("/addAlbum/:title/:artist/:genre", (request, response) -> {
-            int newID = albumList.addAlbum(request.params(":title"), request.params(":artist"), request.params(":genre"));
-            return (newID);
-        });
-        
-
-        
-        get("/gsonAlbums", (req, res) -> {
-            Gson gson = new Gson();
-            System.out.println(gson.toJson(albumList.albums));
-            return gson.toJson(albumList.albums);
-        });*/
+//      get("/userByID", (req, res) -> {
+//      Gson gson = new Gson();
+//      User u = User.GetUserByUserID(3);
+//      System.out.println(u);
+//      return gson.toJson(u);
+ 
+  
+//  //this is for testing insert tweet method
+//  get("/insertTweet2", (request, response) -> {
+//  	Tweet insertTweet = new Tweet();
+//  	insertTweet.connect();
+//  	insertTweet.insert(6,"insert tweet testing6",6666,"");        	
+//      JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/login.jtwig");
+//      JtwigModel model = JtwigModel.newModel();
+//      return template.render(model);
+//  });
 }
 }

@@ -19,25 +19,31 @@ public class Tweet {
 		LocalDateTime TimeStamp = LocalDateTime.now();
 		String date = TimeStamp.toString();
 
-		String sql = "INSERT INTO Tweets(TweetID,Tweet,TimeStamp,UserID,Image) VALUES(?,?,?,?,?)";
+		String sql = "INSERT INTO Tweets(Tweet,TimeStamp,UserID,Image) VALUES(?,?,?,?)";
 
 		try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-			pstmt.setDouble(1, TweetID);
-			pstmt.setString(2, Tweet);
-			pstmt.setString(3, date);
-			pstmt.setDouble(4, UserID);
-			pstmt.setString(5, Image);
+			pstmt.setString(1, Tweet);
+			pstmt.setString(2, date);
+			pstmt.setDouble(3, UserID);
+			pstmt.setString(4, Image);
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
 	}
 
-	public ArrayList<String> get(int userID) {
+	public ArrayList<String> get(int userID, String get) {
 		ArrayList<String> tweetList = new ArrayList<String>();
+		String sql;
 		String resText = "";
-		String sql = "SELECT Tweet FROM Tweets where UserID=" + userID;
-
+//		String sql = "SELECT Tweet FROM Tweets where UserID=" + userID;
+		if (get =="self") {
+			sql = "SELECT Tweet FROM Tweets where UserID=" + userID;
+		} else {
+			sql = "SELECT Tweet FROM Tweets where UserID in "
+				+ "(select FollowedByUserID from Followers where FollowedUserID =" + userID + ")";
+		}
+		System.out.println(sql);
 		try (Connection conn = this.connect();
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sql)) {
@@ -48,6 +54,7 @@ public class Tweet {
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
+//		return tweetList;
 		return tweetList; 
 	}
 
