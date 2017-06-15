@@ -5,9 +5,9 @@
 <body>
 	<h1>Today I shall assume a new identity <i>TwitterClone&trade;!</i></h1>
 	<table><tr><td>
-		<label id="lblUserName">User Name: </label><div id="divUserName">{{user.getUserName()}}</div><br/>
-		<label id="lblPassword">Password: </label><input type="text" id="txtPassword">{{user.getPassword()}}</input><br/>
-		<label id="lblHandle">Handle: </label><input type="text" id="txtHandle">{{user.getHandle()}}</input></td>
+		<div id="divUserName"><label id="lblUserName">User Name: </label>{{user.getUserName()}}</div><br/>
+		<label id="lblPassword">Password: </label><input type="text" id="txtPassword" value="{{user.getPassword()}}"></input><br/>
+		<label id="lblHandle">Handle: </label><input type="text" id="txtHandle" value="{{user.getHandle()}}"></input></td>
 		<td><button id="btnUpdate">Update</button> handle or password.</td>
 			</tr>
 			<tr><td colspan="2"><div id="responseMsg"></div></td>
@@ -20,6 +20,7 @@
 		txtPassword = document.getElementById("txtPassword");
 		txtHandle = document.getElementById("txtHandle");
 		divResponseMsg = document.getElementById("responseMsg");
+		divResponseMsg.innerHTML = "did i get a session? " + '@Session["handle"]';
 
 //get login form data, send to authenticate method
 		btnUpdate.addEventListener('click', function (evt) {
@@ -44,43 +45,6 @@
 			console.log(body);
 			xhr.send(body);
 		});
-
-// show registration form, prepare to process registration
-		btnRegister.addEventListener('click', function (evt) {
-			// show additional required fields for registration
-			divHandle.style.display="block";
-			divCompleteRegistration.style.display="block";
-			// TODO should hide log In and Register buttons
-			divRegister.style.display="none";
-			divLogin.style.display="none";
-		})
-
-// get registration form data, attempt to process registration
-		btnCompleteRegistration.addEventListener('click', function (evt) {
-			// call Register on server
-			var xhr = new XMLHttpRequest();
-			xhr.open('POST', '/register');
-			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-			xhr.onload = function() {
-					if (xhr.status === 200) {
-							var authResponse = xhr.responseText;
-							if (authResponse == "SUCCESS") {
-								window.location = "https://www.google.com/";
-							} else {
-							divResponseMsg.innerHTML = authResponse;
-						}
-					} else if (xhr.status !== 200) {
-							alert('Request failed.  Returned status of ' + xhr.status);
-					}
-			};
-			var username = txtUserName.value;
-			var password = txtPassword.value;
-			var handle = txtHandle.value;
-			var body = 'username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password) + '&handle=' + encodeURIComponent(handle);
-			console.log(body);
-			xhr.send(body);
-			divResponseMsg.innerHTML = txtUserName.value + txtPassword.value + txtHandle.value;
-		})
 
 		</script>
 		</body>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+twig file...test3 20
+
+
+<script>
+var xhr = new XMLHttpRequest();
+xhr.open('GET', '/getMainTweet');
+xhr.onload = function(evt) {
+if (xhr.status === 200) {
+       var response = xhr.responseText;
+       for(var i = 0; i < response.length; i++) {
+           var div = document.createElement('div');
+           div.innerHTML = response[i];
+           document.body.appendChild(div);
+       }
+       console.log(response);
+   } else {
+                       alert('Request failed.  Returned status of ' + xhr.status);
+                       }
+              };
+xhr.send();
+
+</script>
+
+</body>
+</html>
