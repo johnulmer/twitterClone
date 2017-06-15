@@ -39,13 +39,29 @@ public class TwitterRouter {
 	}
 
     public static void main(String[] args) {
-        port(3002);
+        port(3000);
 
         get("/login", (request, response) -> {
 	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/login.jtwig");
 	        JtwigModel model = JtwigModel.newModel();
 	        return template.render(model);
-        });        
+        });
+        
+        get("/userFollow", (request, response) -> {
+	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/userFollow.jtwig");
+	        JtwigModel model = JtwigModel.newModel();
+	        return template.render(model);
+        }); 
+        
+        get("/showUnfollowedUsers", (request, response) -> {
+        	System.out.println("showing unfollowed users");
+        	User u = User.GetUserByUserID(2);
+        	ArrayList unfollowedUsers = u.UnfollowedUsers();
+	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/userDisplay.jtwig");
+	        JtwigModel model = JtwigModel.newModel().with("userlist", unfollowedUsers);
+	        System.out.println(template.render(model));
+	        return template.render(model);
+        });   
  
         post("/authenticate", (request, response) -> {
         	return TwitterRouter.Authenticate(request, response);

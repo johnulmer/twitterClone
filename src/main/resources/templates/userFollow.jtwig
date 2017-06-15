@@ -1,0 +1,42 @@
+<html>
+<head>
+</head>
+<body>
+<h1>Follow tester</h1>
+<div id=divUnfollowedUsers>
+</div>
+<button id="btnShowUnfollowedUsers">Who shall lead me?</button>
+<div id="responseMsg"></div>
+<script>
+
+		btnShowUnfollowedUsers = document.getElementById("btnShowUnfollowedUsers");
+    divUnfollowedUsers = document.getElementById("divUnfollowedUsers");
+    divResponseMsg = document.getElementById("responseMsg");
+
+btnShowUnfollowedUsers.addEventListener('click', function (evt) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', '/showUnfollowedUsers');
+  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  xhr.onload = function() {
+      if (xhr.status === 200) {
+          //var authResponse = xhr.responseText;
+          //if (authResponse == "SUCCESS") {
+            divUnfollowedUsers.innerHTML = xhr.responseText;
+            //window.location = "/userUpdate";
+            //window.location = "https://www.google.com/";
+          //} else {
+          //divResponseMsg.innerHTML = authResponse;
+        //}
+      } else if (xhr.status !== 200) {
+          alert('Request failed.  Returned status of ' + xhr.status);
+      }
+  };
+  //var username = txtUserName.value;
+  //var password = txtPassword.value;
+  //var body = 'username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password);
+  //console.log(body);
+  xhr.send();
+});
+</script>
+</body>
+</html>
