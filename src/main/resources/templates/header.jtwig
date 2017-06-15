@@ -1,3 +1,8 @@
 <header>
-<h1>TwitterClone&trade;</h1><img src="images/birds.jpg">
+<table><tr>
+<td><img src="images/leftbirds.jpg"></td>
+<td style="text-align: center"><h1> TwitterClone&trade; </h1>
+<p><i>We're the Rutger Hauer<br/>of social media.</i></p></td>
+<td><img src="images/rightbirds.jpg"></td>
+</tr></table>
 </header>

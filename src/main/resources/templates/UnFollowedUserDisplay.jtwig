@@ -1,0 +1,8 @@
+<h2>Users who are not followed</h2>
+{% for u in userlist %}
+<div id="div{{u.userID}}">
+    <ul>
+        <li>Follow <a href="/follow/{{u.userID}}">{{u.handle}}</a></li>
+    </ul>
+</div>
+{% endfor %}

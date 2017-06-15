@@ -2,15 +2,18 @@
 <head>
 </head>
 <body>
-<h1>Follow tester</h1>
-<div id=divUnfollowedUsers>
+  {% include "header.jtwig" ignore missing %}
+<h2>Follow / Unfollow tester page</h2>
+<div id=divUsers>
 </div>
-<button id="btnShowUnfollowedUsers">Who shall lead me?</button>
+<button id="btnShowUnfollowedUsers">Users I do not follow.</button>
+<button id="btnAlreadyFollowing">Users I follow.</button>
 <div id="responseMsg"></div>
 <script>
 
 		btnShowUnfollowedUsers = document.getElementById("btnShowUnfollowedUsers");
-    divUnfollowedUsers = document.getElementById("divUnfollowedUsers");
+    btnShowUnfollowedUsers = document.getElementById("btnShowUnfollowedUsers");
+    divUsers = document.getElementById("divUsers");
     divResponseMsg = document.getElementById("responseMsg");
 
 btnShowUnfollowedUsers.addEventListener('click', function (evt) {
@@ -19,22 +22,24 @@ btnShowUnfollowedUsers.addEventListener('click', function (evt) {
   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   xhr.onload = function() {
       if (xhr.status === 200) {
-          //var authResponse = xhr.responseText;
-          //if (authResponse == "SUCCESS") {
-            divUnfollowedUsers.innerHTML = xhr.responseText;
-            //window.location = "/userUpdate";
-            //window.location = "https://www.google.com/";
-          //} else {
-          //divResponseMsg.innerHTML = authResponse;
-        //}
+            divUsers.innerHTML = xhr.responseText;
       } else if (xhr.status !== 200) {
           alert('Request failed.  Returned status of ' + xhr.status);
       }
   };
-  //var username = txtUserName.value;
-  //var password = txtPassword.value;
-  //var body = 'username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password);
-  //console.log(body);
+  xhr.send();
+});
+  btnAlreadyFollowing.addEventListener('click', function (evt) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/showFollowedUsers');
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+              divUsers.innerHTML = xhr.responseText;
+        } else if (xhr.status !== 200) {
+            alert('Request failed.  Returned status of ' + xhr.status);
+        }
+    };
   xhr.send();
 });
 </script>

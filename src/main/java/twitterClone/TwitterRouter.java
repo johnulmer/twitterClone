@@ -1,8 +1,5 @@
 package twitterClone;
 
-
-
-
 import static spark.Spark.*;
 import java.util.ArrayList;
 import org.jtwig.JtwigModel;
@@ -39,7 +36,8 @@ public class TwitterRouter {
 	}
 
     public static void main(String[] args) {
-        port(3000);
+        port(3004);
+        staticFiles.location("/public");
 
         get("/login", (request, response) -> {
 	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/login.jtwig");
@@ -55,13 +53,23 @@ public class TwitterRouter {
         
         get("/showUnfollowedUsers", (request, response) -> {
         	System.out.println("showing unfollowed users");
-        	User u = User.GetUserByUserID(2);
-        	ArrayList unfollowedUsers = u.UnfollowedUsers();
-	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/userDisplay.jtwig");
+        	//User u = User.GetUserByUserID(2);
+        	ArrayList unfollowedUsers = User.UnfollowedUsers(2);
+	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/UnFollowedUserDisplay.jtwig");
 	        JtwigModel model = JtwigModel.newModel().with("userlist", unfollowedUsers);
 	        System.out.println(template.render(model));
 	        return template.render(model);
         });   
+        
+        get("/showFollowedUsers", (request, response) -> {
+        	System.out.println("showing Followed users");
+        	//User u = User.GetUserByUserID(2);
+        	ArrayList followedUsers = User.FollowedUsers(2);
+	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/FollowedUserDisplay.jtwig");
+	        JtwigModel model = JtwigModel.newModel().with("userlist", followedUsers);
+	        System.out.println(template.render(model));
+	        return template.render(model);
+        }); 
  
         post("/authenticate", (request, response) -> {
         	return TwitterRouter.Authenticate(request, response);

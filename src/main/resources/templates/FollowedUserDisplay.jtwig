@@ -1,7 +1,7 @@
 {% for u in userlist %}
 <div id="div{{u.userID}}">
     <ul>
-        <li>Follow <a href="/follow/{{u.userID}}">{{u.handle}}</a></li>
+        <li>Unfollow <a href="/unfollow/{{u.userID}}">{{u.handle}}</a></li>
     </ul>
 </div>
 {% endfor %}

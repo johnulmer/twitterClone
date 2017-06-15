@@ -43,11 +43,14 @@ public class User {
 		System.out.println(sqlString);
 	}
 	
-	public ArrayList UnfollowedUsers() {
+	public static ArrayList UnfollowedUsers(int userID) {
 		ArrayList unfollowedUsers = new ArrayList();
-		String sqlString = "Select * FROM Users";
+		String sqlString = "Select * FROM Users WHERE UserID NOT IN " + 
+				"(SELECT UserID FROM Users, Followers WHERE Followers.FollowedByUserID = " + userID + 
+				" AND Users.UserID = Followers.FollowedUserID)";
 		System.out.println(sqlString);
-        try (Connection conn = this.connect();
+		User connectU = new User();
+        try (Connection conn = connectU.connect();
                 Statement stmt  = conn.createStatement();
                 ResultSet rs    = stmt.executeQuery(sqlString)){
                while (rs.next()) {
@@ -60,6 +63,26 @@ public class User {
                System.out.println(e.getMessage());
            }
 		return unfollowedUsers;
+	}
+	public static ArrayList FollowedUsers(int userID) {
+		ArrayList followedUsers = new ArrayList();
+		String sqlString = "Select * FROM Users, Followers WHERE Followers.FollowedByUserID = " + 
+				userID + " AND Users.UserID = Followers.FollowedUserID AND Users.UserID != " + userID;
+		System.out.println(sqlString);
+		User connectU = new User();
+        try (Connection conn = connectU.connect();
+                Statement stmt  = conn.createStatement();
+                ResultSet rs    = stmt.executeQuery(sqlString)){
+               while (rs.next()) {
+            	   System.out.println("adding user");
+            	   User u = new User(rs.getString("UserName"), "", rs.getString("handle"));
+            	   u.userID = rs.getInt("UserID");
+            	   followedUsers.add(u);
+               }
+           } catch (SQLException e) {
+               System.out.println(e.getMessage());
+           }
+		return followedUsers;
 	}
 	
 	// Read user from DB by userName
