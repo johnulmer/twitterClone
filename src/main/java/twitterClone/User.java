@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 public class User {
 
@@ -40,6 +41,25 @@ public class User {
 		String sqlString = "INSERT INTO Users (UserName, Password, Handle) VALUES (" 
 				+ this.userName + ", " + this.password + "," + this.handle + ")";
 		System.out.println(sqlString);
+	}
+	
+	public ArrayList UnfollowedUsers() {
+		ArrayList unfollowedUsers = new ArrayList();
+		String sqlString = "Select * FROM Users";
+		System.out.println(sqlString);
+        try (Connection conn = this.connect();
+                Statement stmt  = conn.createStatement();
+                ResultSet rs    = stmt.executeQuery(sqlString)){
+               while (rs.next()) {
+            	   System.out.println("adding user");
+            	   User u = new User(rs.getString("UserName"), "", rs.getString("handle"));
+            	   u.userID = rs.getInt("UserID");
+            	   unfollowedUsers.add(u);
+               }
+           } catch (SQLException e) {
+               System.out.println(e.getMessage());
+           }
+		return unfollowedUsers;
 	}
 	
 	// Read user from DB by userName
