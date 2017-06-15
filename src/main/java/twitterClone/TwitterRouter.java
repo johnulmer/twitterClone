@@ -31,6 +31,7 @@ public class TwitterRouter {
     	if (UserID > -1) {
 	        request.session().attribute("userID", Integer.toString(UserID));
 	        request.session().attribute("username", username);
+	        request.session().attribute("handle", User.GetUserByUserID(UserID).getHandle());
     		return "SUCCESS";
     	} else {
     		return "Unable to authenticate - please try again or register if you are a new user.";
@@ -38,7 +39,7 @@ public class TwitterRouter {
 	}
 
     public static void main(String[] args) {
-        port(3003);
+        port(3002);
 
         get("/login", (request, response) -> {
 	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/login.jtwig");
@@ -55,7 +56,12 @@ public class TwitterRouter {
         });
         
         get("/userUpdate", (request, response) -> {
-        	User u = new User("users name", "pass word", "this is a handle");
+        	//System.out.println(request.session().attributes());
+        	//System.out.println("userID: " + request.session().attribute("userID"));
+        	//System.out.println("username: " + request.session().attribute("username"));
+        	//System.out.println("handle: " + request.session().attribute("handle"));
+        	User u = User.GetUserByUserID(Integer.parseInt(request.session().attribute("userID")));
+        	//User u = new User("users name", "pass word", "this is a handle");
 	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/userUpdate.jtwig");
 	        JtwigModel model = JtwigModel.newModel().with("user", u);
 	        return template.render(model);

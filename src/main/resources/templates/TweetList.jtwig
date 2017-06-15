@@ -1,0 +1,8 @@
+{% for t in tweetlist %}
+<div id="div{{t.tweetID}}">
+    <ul>
+        <li><a href="/like/{{t.tweetID}}">Like!</a>{{t.text}}</li>
+        <li>By {{t.userID}}</li>
+    </ul>
+</div>
+{% endfor %}

@@ -40,7 +40,8 @@
 					if (xhr.status === 200) {
 							var authResponse = xhr.responseText;
 							if (authResponse == "SUCCESS") {
-								window.location = "https://www.google.com/";
+								window.location = "/userUpdate";
+								//window.location = "https://www.google.com/";
 							} else {
 							divResponseMsg.innerHTML = authResponse;
 						}
