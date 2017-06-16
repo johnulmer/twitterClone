@@ -4,93 +4,102 @@ import static spark.Spark.*;
 import java.util.ArrayList;
 import org.jtwig.JtwigModel;
 import org.jtwig.JtwigTemplate;
-import com.google.gson.Gson;
+//import com.google.gson.Gson;
 
 public class TwitterRouter {
 	
-	private static String Register(spark.Request request, spark.Response response) {
-        String username = request.queryParams("username");
-        String password = request.queryParams("password");
-        String handle = request.queryParams("handle");
-        String registration = User.Register(username, password, handle);
-        if (registration.equals("SUCCESS")) {
-	        request.session().attribute("userID", User.GetUserByUserName(username));
-	        request.session().attribute("username", username);
-	        request.session().attribute("handle", handle);
-        }
-    	return registration;
+	private static void SetSession(spark.Request request, User u) {
+        request.session().attribute("userID", u.GetUserID());
+        request.session().attribute("username", u.getUserName());
+        request.session().attribute("handle", u.getHandle());
 	}
-	
+	private static String LogIn(spark.Request request, spark.Response response) {
+        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/login.jtwig");
+        JtwigModel model = JtwigModel.newModel();
+        return template.render(model);
+	}
 	private static String Authenticate(spark.Request request, spark.Response response) {
-        String username = request.queryParams("username");
-        String password = request.queryParams("password");
-    	int UserID = User.Authenticate(username, password);
-    	if (UserID > -1) {
-	        request.session().attribute("userID", Integer.toString(UserID));
-	        request.session().attribute("username", username);
-	        request.session().attribute("handle", User.GetUserByUserID(UserID).getHandle());
+        User u = new User(request.queryParams("username"), 
+        		request.queryParams("password"), 
+        		request.queryParams("handle"));
+    	u.Authenticate();
+    	if (u.GetUserID() > -1) {
+    		SetSession(request, u);
     		return "SUCCESS";
     	} else {
     		return "Unable to authenticate - please try again or register if you are a new user.";
     	}
 	}
+	private static String Register(spark.Request request, spark.Response response) {
+        User u = new User(request.queryParams("username"), 
+        		request.queryParams("password"), 
+        		request.queryParams("handle"));
+        String registration = u.ValidNewUser();
+        if (registration.equals("SUCCESS")) {
+        	u.Register();
+        	SetSession(request, u);
+        }
+    	return registration;
+	}
+	private static String Update(spark.Request request, spark.Response response) {
+    	User u = new User(Integer.parseInt(request.session().attribute("userID")));
+        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/userUpdate.jtwig");
+        JtwigModel model = JtwigModel.newModel().with("user", u);
+        return template.render(model);
+	}
+	private static String UserFollow(spark.Request request, spark.Response response) {
+	    JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/userFollow.jtwig");
+	    JtwigModel model = JtwigModel.newModel();
+	    return template.render(model);
+	}
+    
+	private static String ShowFollowedUsers(spark.Request request, spark.Response response) {
+    	User u = new User(2);  // hard-coded for testing, will add session checking later
+    	ArrayList<User> followedUsers = u.GetFollowedUsers();
+        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/FollowedUserDisplay.jtwig");
+        JtwigModel model = JtwigModel.newModel().with("userlist", followedUsers);
+        System.out.println(template.render(model));
+        return template.render(model);
+	}
+	private static String ShowUnFollowedUsers(spark.Request request, spark.Response response) {
+		User u = new User(2);  // hard-coded for testing, will add session checking later
+		ArrayList<User> unfollowedUsers = u.GetUnfollowedUsers();
+	    JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/UnFollowedUserDisplay.jtwig");
+	    JtwigModel model = JtwigModel.newModel().with("userlist", unfollowedUsers);
+	    System.out.println(template.render(model));
+	    return template.render(model);
+	}
 
     public static void main(String[] args) {
-        port(3004);
+        port(3005);
         staticFiles.location("/public");
-
+        
+        // show log in, auth, register.  login page is a template to handle header include
         get("/login", (request, response) -> {
-	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/login.jtwig");
-	        JtwigModel model = JtwigModel.newModel();
-	        return template.render(model);
+        	return LogIn(request, response);
         });
-        
-        get("/userFollow", (request, response) -> {
-	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/userFollow.jtwig");
-	        JtwigModel model = JtwigModel.newModel();
-	        return template.render(model);
-        }); 
-        
-        get("/showUnfollowedUsers", (request, response) -> {
-        	System.out.println("showing unfollowed users");
-        	//User u = User.GetUserByUserID(2);
-        	ArrayList unfollowedUsers = User.UnfollowedUsers(2);
-	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/UnFollowedUserDisplay.jtwig");
-	        JtwigModel model = JtwigModel.newModel().with("userlist", unfollowedUsers);
-	        System.out.println(template.render(model));
-	        return template.render(model);
-        });   
-        
-        get("/showFollowedUsers", (request, response) -> {
-        	System.out.println("showing Followed users");
-        	//User u = User.GetUserByUserID(2);
-        	ArrayList followedUsers = User.FollowedUsers(2);
-	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/FollowedUserDisplay.jtwig");
-	        JtwigModel model = JtwigModel.newModel().with("userlist", followedUsers);
-	        System.out.println(template.render(model));
-	        return template.render(model);
-        }); 
- 
         post("/authenticate", (request, response) -> {
-        	return TwitterRouter.Authenticate(request, response);
+        	return Authenticate(request, response);
         });
-        
         post("/register", (request, response) -> {
-        	return TwitterRouter.Register(request, response);
+        	return Register(request, response);
         });
         
+        // user maint pages - handle / password changes, TODO add block other users
         get("/userUpdate", (request, response) -> {
-        	//System.out.println(request.session().attributes());
-        	//System.out.println("userID: " + request.session().attribute("userID"));
-        	//System.out.println("username: " + request.session().attribute("username"));
-        	//System.out.println("handle: " + request.session().attribute("handle"));
-        	User u = User.GetUserByUserID(Integer.parseInt(request.session().attribute("userID")));
-        	//User u = new User("users name", "pass word", "this is a handle");
-	        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/userUpdate.jtwig");
-	        JtwigModel model = JtwigModel.newModel().with("user", u);
-	        return template.render(model);
+        	return Update(request, response);
         });
-
+        
+        // actions related to following (show all, follow, unfollow)
+        get("/userFollow", (request, response) -> {
+        	return UserFollow(request, response);
+        });
+        get("/showUnfollowedUsers", (request, response) -> {
+        	return ShowUnFollowedUsers(request, response);
+        });   
+        get("/showFollowedUsers", (request, response) -> {
+        	return ShowFollowedUsers(request, response);
+        }); 
         
         //this is for inserting tweet into DB. 
         get("/insertTweet", (request, response) -> {

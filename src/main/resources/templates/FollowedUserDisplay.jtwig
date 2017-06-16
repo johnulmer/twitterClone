@@ -1,7 +1,20 @@
+
+<img src="images/follow.jpg">
+<h2>Users who are followed</h2>
+<div id="followedList">
 {% for u in userlist %}
-<div id="div{{u.userID}}">
+<div userid="div{{u.userID}}">
     <ul>
-        <li>Unfollow <a href="/unfollow/{{u.userID}}">{{u.handle}}</a></li>
+        <li><button userid="div{{u.userID}}">Unfollow {{u.handle}}</button></li>
     </ul>
 </div>
 {% endfor %}
+</div>
+<script>
+var divFollowedList = document.getElementById("followedList");
+divFollowedList.addEventListener('click', function (evt) {
+  if (evt.target.getAttribute("userid")) {
+    alert(evt.target.getAttribute("userid") + " click");
+}
+});
+</script>
