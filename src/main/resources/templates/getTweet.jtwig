@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+  <h2>Tweets</h2>
+  <div id="tweets">
+  <div>
+{% for t in tweets %}
+    {{t.tweet}}
+    <button  btweetID={{t.tweetID}} >REPLY</button> <br />
+    <input type="text" id={{t.tweetID}} name="replytext" style="display: none;">
+    <div data-replyid=reply{{t.tweetID}} style="display: none;">
+    </div>
+    <button  data-btweetID=button{{t.tweetID}} style="display: none;">Enter</button> <br />
+    <button  btweetID={{t.tweetID}} style="display: none;">Cancel</button> <br />
+{% endfor %}
+    <p>Result:&nbsp;<span id="result"></span></p>
+  </div>
+</div>
+
+<div id="msg_div" class="">
+    </div>
+<div id="tweet_container" style="color: red;">
+
+</div>
+<script>
+var replydelete = "reply...."
+var divItems = document.getElementById("tweets");
+   divItems.addEventListener('click', function (evt) {
+     if (event.target.getAttribute("btweetID")) {
+       var ele = document.getElementById(event.target.getAttribute("btweetID"));
+     ele.style.display = "block";
+    var buttonstring = "button" + event.target.getAttribute("btweetID");
+    console.log(buttonstring);
+    console.log("tweets " + tweets);
+     var button = document.querySelector(`button[data-btweetID='${buttonstring}']`);
+    button.style.display = "block";
+    var replystring = "reply" + event.target.getAttribute("btweetID");
+    var disReply = document.querySelector(`div[data-replyid='${replystring}']`);
+    var myNode = document.getElementById("1");
+    myNode.innerHTML = '';
+    // var myNode = document.getElementById("1");
+    // while (myNode.firstChild) {
+    //   myNode.removeChild(myNode.firstChild);
+    // }
+    var rtweetID = event.target.getAttribute("btweetID")
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/getreplies?rtweetID=' + rtweetID);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onload = function() {
+    if (xhr.status === 200) {
+       console.log("reply related logic starts here5");
+      //  var result = document.getElementById('result');
+      //  console.log(xhr.responseText);
+      //  result.innerHTML = xhr.responseText;
+       var response = JSON.parse(xhr.responseText);
+       var node = document.querySelector(`div[data-replyid='${replystring}']`);
+       node.innerHTML = '';
+       for(var i = 0; i < response.length; i++) {
+          var newdiv = document.createElement("div");
+          newdiv.innerHTML = response[i].replyText;
+          console.log(response[i].replyText);
+          node.appendChild(newdiv);
+          disReply.style.display = "block";
+        }
+    } else if (xhr.status !== 200) {
+         alert('Request failed.  Returned status of ' + xhr.status);
+        }
+    };
+    xhr.send();
+   }
+   })
+
+// code to process the reply after enter is clicked
+var enterb = document.getElementById("tweets");
+enterb.addEventListener('click', function (evt) {
+  if (event.target.getAttribute("data-btweetID")) {
+    console.log(event.target.getAttribute("data-btweetID"));
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/tweetReply');
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            var result = document.getElementById('result');
+            result.innerHTML = xhr.responseText;
+        } else if (xhr.status !== 200) {
+            alert('Request failed.  Returned status of ' + xhr.status);
+        }
+    };
+    //Get Userid needs to be included....RAVI
+    var vuserID = 0;
+    var vtweetID = event.target.getAttribute("data-btweetID").substring(6);
+    console.log(vtweetID);
+    console.log(document.getElementById(vtweetID).value);
+    // Get tweetmessage
+    var vtweetReply = (document.getElementById(vtweetID).value);
+    var body = 'vtweetReply=' + encodeURIComponent(vtweetReply) + '&vtweetID=' + encodeURIComponent(vtweetID) +
+    '&vuserID=' + encodeURIComponent(vuserID);
+    console.log(body);
+    xhr.send(body);
+  }
+})
+ // })
+</script>
+
+</body>
+</html>

@@ -8,8 +8,8 @@
 <hr>
 <div>
     <div>
-        <label for="textInputID">Tweet</label>
-        <input type="text" id="textInputID" size="140">
+        <label for="a">Tweet</label>
+        <input type="text" id="a" size="140">
 
         <br>
         <p>Result:&nbsp;<span id="result"></span></p>
@@ -22,7 +22,7 @@
 var button = document.getElementById('Tweet_button');
 button.onclick = function () {
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/insertTweet');
+    xhr.open('POST', '/test');
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.onload = function() {
         if (xhr.status === 200) {
@@ -32,7 +32,7 @@ button.onclick = function () {
             alert('Request failed.  Returned status of ' + xhr.status);
         }
     };
-    var tweetMessage = document.getElementById('textInputID').value;
+    var tweetMessage = document.getElementById('a').value;
     var body = 'tweetMessage=' + encodeURIComponent(tweetMessage);
     console.log(body);
     xhr.send(body);

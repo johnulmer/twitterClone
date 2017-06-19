@@ -1,28 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Tweet Message</title>
+    <title>Reply to Tweet</title>
 </head>
 <body>
-<h2>Enter Tweet</h2>
+<h2>Reply Tweet</h2>
 <hr>
 <div>
     <div>
-        <label for="textInputID">Tweet</label>
-        <input type="text" id="textInputID" size="140">
+        <label for="replyInput">Reply</label>
+        <input type="text" id="replyInput" size="140">
 
         <br>
         <p>Result:&nbsp;<span id="result"></span></p>
     </div>
-    <button id="Tweet_button">Tweet</button>
+    <button id="Reply_button">Tweet</button>
 </div>
 
 <script>
 // AJAX posting x-www-form-urlencoded
-var button = document.getElementById('Tweet_button');
+var button = document.getElementById('Reply_button');
 button.onclick = function () {
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/insertTweet');
+    xhr.open('POST', '/insertReply');
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.onload = function() {
         if (xhr.status === 200) {
@@ -32,8 +32,8 @@ button.onclick = function () {
             alert('Request failed.  Returned status of ' + xhr.status);
         }
     };
-    var tweetMessage = document.getElementById('textInputID').value;
-    var body = 'tweetMessage=' + encodeURIComponent(tweetMessage);
+    var replyMessage = document.getElementById('replyInput').value;
+    var body = 'replyMessage=' + encodeURIComponent(replyMessage);
     console.log(body);
     xhr.send(body);
 };
