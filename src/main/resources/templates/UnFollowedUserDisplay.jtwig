@@ -1,5 +1,5 @@
-<h2>Users who are not followed</h2>
-<img src="images/unfollow.jpg">
+<h2>I am not following: </h2>
+<table><tr><td>
 <div id="UnFollowedList">
 {% for u in userlist %}
 <div userid="div{{u.userID}}">
@@ -8,10 +8,17 @@
     </ul>
 </div>
 {% endfor %}
+</td>
+<td>
+<img src="images/unfollow.jpg">
+</td>
+</tr>
+</table>
 </div>
 <script>
 var divUnFollowedList = document.getElementById("UnFollowedList");
 divUnFollowedList.addEventListener('click', function (evt) {
+  alert("got a click");
   if (evt.target.getAttribute("userid")) {
     alert(evt.target.getAttribute("userid") + " click");
 }

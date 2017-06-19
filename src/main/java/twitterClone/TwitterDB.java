@@ -2,6 +2,7 @@ package twitterClone;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -12,8 +13,7 @@ public class TwitterDB {
 	public static final String DBURL = "jdbc:sqlite:twitterClone.db";
 	
     private static Connection connect() {
-        // SQLite connection string
-        String url = TwitterDB.DBURL;
+        String url = TwitterDB.DBURL;     // SQLite connection string
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(url);
@@ -22,130 +22,208 @@ public class TwitterDB {
         }
         return conn;
     }
-	
-	public static ArrayList<User> UnfollowedUsers(int userID) {
-		ArrayList<User> unfollowedUsers = new ArrayList<User>();
-		String sqlString = "Select * FROM Users WHERE UserID NOT IN " + 
-				"(SELECT UserID FROM Users, Followers WHERE Followers.FollowedByUserID = " + userID + 
-				" AND Users.UserID = Followers.FollowedUserID)";
-		System.out.println(sqlString);
-        try (Connection conn = connect();
-                Statement stmt  = conn.createStatement();
-                ResultSet rs    = stmt.executeQuery(sqlString)){
-               while (rs.next()) {
-            	   System.out.println("adding user");
-            	   User u = new User(rs.getString("UserName"), "", rs.getString("handle"), rs.getInt("UserID"));
-            	   unfollowedUsers.add(u);
-               }
-           } catch (SQLException e) {
-               System.out.println(e.getMessage());
-           }
-		return unfollowedUsers;
-	}
 
 // Read user from DB by userID
-public static User GetUserByUserID(int userID) {
-	User u = new User();
-	String sqlString = "SELECT UserID, UserName, Password, Handle FROM Users WHERE UserID = " + userID;
-    try (Connection conn = connect();
-            Statement stmt  = conn.createStatement();
-            ResultSet rs    = stmt.executeQuery(sqlString)){
-           
-           // loop through the result set
-           while (rs.next()) {
-               System.out.println(rs.getInt("UserID") +  "\t" + 
-                                  rs.getString("UserName") + "\t" +
-                                  rs.getString("Handle"));
-       			u = new User(rs.getString("UserName"), rs.getString("Password"), rs.getString("Handle"));
-           }
-       } catch (SQLException e) {
-           System.out.println(e.getMessage());
-       }
-	System.out.println("reading user");
-	return u;
-}
+	public static User getUserByUserID(int userID) {
+		User u = new User();
+		Connection conn = null;
+		PreparedStatement prepStmt = null;
+		ResultSet rs = null;
+		try {
+			conn = connect();
+			prepStmt = conn.prepareStatement("SELECT UserID, UserName, Password, Handle FROM Users WHERE UserID = ?");
+			prepStmt.setInt(1, userID);
+			rs = prepStmt.executeQuery();
+			while (rs.next()) {
+				u = new User(rs.getString("UserName"), rs.getString("Password"), rs.getString("Handle"));
+			}
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		} finally {
+			try {
+				rs.close();
+				prepStmt.close();
+				conn.close();
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+		System.out.println("reading user by ID");
+		return u;
+	}
 
-public static String GetUserHandle(User u) {
+public static String getUserHandle(User u) {
 	return "should be a handle";
 }
 
 // Authenticate user based on userName and password
-public static int Authenticate(String userName, String password) {
-	int userID = -1;
-	String sqlString = "SELECT UserID FROM Users WHERE UserName = '" + userName + "' AND Password = '" + password + "'";
-    try (Connection conn = connect();
-            Statement stmt  = conn.createStatement();
-            ResultSet rs    = stmt.executeQuery(sqlString)){
-           while (rs.next()) {
-        	   userID = rs.getInt("UserID");
-           }
-           System.out.println("found ID: " + userID);
-       } catch (SQLException e) {
-           System.out.println(e.getMessage());
-       }
-	return userID;
-}
+	public static int authenticate(String userName, String password) {
+		int userID = -1;
+		Connection conn = null;
+		PreparedStatement prepStmt = null;
+		ResultSet rs = null;
+		try {
+			conn = connect();
+			prepStmt = conn.prepareStatement("SELECT UserID FROM Users WHERE UserName = ? AND Password = ?");
+			prepStmt.setString(1, userName);
+			prepStmt.setString(2, password);
+			rs = prepStmt.executeQuery();
+			while (rs.next()) {
+				userID = rs.getInt("UserID");
+			}
+			System.out.println("found ID: " + userID);
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		} finally {
+			try {
+				rs.close();
+				prepStmt.close();
+				conn.close();
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+		System.out.println("reading user by ID");
+		return userID;
+	}
 
-public static int ProcessRegistration(String userName, String password, String handle) {
-	String sqlString = "INSERT INTO Users (UserName, Password, Handle) VALUES " +
-			"('" + userName + "',  '" + password + "', '" + handle + "')";
-	System.out.println(sqlString);
-    try (Connection conn = connect();
-            Statement stmt  = conn.createStatement();
-            ResultSet rs    = stmt.executeQuery(sqlString)){
+// add a new user, return newly added user	
+public static int processRegistration(String userName, String password, String handle) {
+	Connection conn = null;
+	PreparedStatement prepStmt = null;
+	try {
+		conn = connect();
+		prepStmt = conn.prepareStatement("INSERT INTO Users (UserName, Password, Handle) VALUES (?, ?, ?)");
+		prepStmt.setString(1, userName);
+		prepStmt.setString(2, password);
+		prepStmt.setString(2, handle);
+		prepStmt.executeUpdate();
+	
        } catch (SQLException e) {
            System.out.println(e.getMessage());
+       } finally {
+			try {
+				prepStmt.close();
+				conn.close();
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
        }
-    return GetUserByUserName(userName);
+    return getUserByUserName(userName);
 }
 // Read user from DB by userName
-public static int GetUserByUserName(String userName) {
-	int userID = -1;
-	String sqlString = "SELECT UserID FROM Users WHERE UserName = '" + userName + "'";
-	System.out.println(sqlString);
-    try (Connection conn = connect();
-            Statement stmt  = conn.createStatement();
-            ResultSet rs    = stmt.executeQuery(sqlString)){
-           while (rs.next()) {
-        	   userID = rs.getInt("UserID");
-           }
-       } catch (SQLException e) {
-           System.out.println(e.getMessage());
-       }
-	return userID;
-}
-// Read user from DB by userName
-public static int GetUserByHandle(String handle) {
-	int userID = -1;
-	String sqlString = "SELECT UserID FROM Users WHERE Handle = '" + handle + "'";
-	System.out.println(sqlString);
-    try (Connection conn = connect();
-            Statement stmt  = conn.createStatement();
-            ResultSet rs    = stmt.executeQuery(sqlString)){
-           while (rs.next()) {
-        	   userID = rs.getInt("UserID");
-           }
-       } catch (SQLException e) {
-           System.out.println(e.getMessage());
-       }
-	return userID;
-}
-public static ArrayList<User> FollowedUsers(int userID) {
+	public static int getUserByUserName(String userName) {
+		int userID = -1;
+		Connection conn = null;
+		PreparedStatement prepStmt = null;
+		ResultSet rs = null;
+		try {
+			conn = connect();
+			prepStmt = conn.prepareStatement("SELECT UserID FROM Users WHERE UserName = ?");
+			prepStmt.setString(1, userName);
+			rs = prepStmt.executeQuery();
+			while (rs.next()) {
+				userID = rs.getInt("UserID");
+			}
+			System.out.println("found ID: " + userID);
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		} finally {
+			try {
+				rs.close();
+				prepStmt.close();
+				conn.close();
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+		return userID;
+	}
+// Read user from DB by user handle (screenname)
+	public static int getUserByHandle(String handle) {
+		int userID = -1;
+		Connection conn = null;
+		PreparedStatement prepStmt = null;
+		ResultSet rs = null;
+		try {
+			conn = connect();
+			prepStmt = conn.prepareStatement("SELECT UserID FROM Users WHERE Handle = ?");
+			prepStmt.setString(1, handle);
+			rs = prepStmt.executeQuery();
+			while (rs.next()) {
+				userID = rs.getInt("UserID");
+			}
+			System.out.println("found ID: " + userID);
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		} finally {
+			try {
+				rs.close();
+				prepStmt.close();
+				conn.close();
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+		return userID;
+	}
+	
+// return users who are followed	
+public static ArrayList<User> followedUsers(int userID) {
 	ArrayList<User> followedUsers = new ArrayList<User>();
+	Connection conn = null;
+	PreparedStatement prepStmt = null;
+	ResultSet rs = null;
+	
 	String sqlString = "Select * FROM Users, Followers WHERE Followers.FollowedByUserID = " + 
 			userID + " AND Users.UserID = Followers.FollowedUserID AND Users.UserID != " + userID;
-	System.out.println(sqlString);
-    try (Connection conn = connect();
-            Statement stmt  = conn.createStatement();
-            ResultSet rs    = stmt.executeQuery(sqlString)){
-           while (rs.next()) {
-        	   System.out.println("adding user");
-        	   User u = new User(rs.getString("UserName"), "", rs.getString("handle"),rs.getInt("UserID"));
-        	   followedUsers.add(u);
-           }
-       } catch (SQLException e) {
+	try {
+		conn = connect();
+		prepStmt = conn.prepareStatement("Select * FROM Users, Followers WHERE Followers.FollowedByUserID = ? " +
+				"AND Users.UserID = Followers.FollowedUserID AND Users.UserID != ?");
+		prepStmt.setInt(1, userID);
+		prepStmt.setInt(2, userID);
+		rs = prepStmt.executeQuery();
+		while (rs.next()) {
+			System.out.println("adding user");
+			User u = new User(rs.getString("UserName"), "", rs.getString("handle"), rs.getInt("UserID"));
+			followedUsers.add(u);
+		}
+	} catch (SQLException e) {
            System.out.println(e.getMessage());
        }
 	return followedUsers;
+}
+// return users who are not followed
+public static ArrayList<User> unfollowedUsers(int userID) {
+	ArrayList<User> unfollowedUsers = new ArrayList<User>();
+	Connection conn = null;
+	PreparedStatement prepStmt = null;
+	ResultSet rs = null;
+	try {
+		conn = connect();
+		prepStmt = conn.prepareStatement(
+				"Select * FROM Users WHERE UserID NOT IN " + 
+						"(SELECT UserID FROM Users, Followers WHERE " + 
+						"Followers.FollowedByUserID = ? AND Users.UserID = Followers.FollowedUserID)");
+		prepStmt.setInt(1, userID);
+		rs = prepStmt.executeQuery();
+		while (rs.next()) {
+			System.out.println("adding user");
+			User u = new User(rs.getString("UserName"), "", rs.getString("handle"), rs.getInt("UserID"));
+			unfollowedUsers.add(u);
+		}
+	} catch (SQLException e) {
+		System.out.println(e.getMessage());
+	} finally {
+		try {
+			rs.close();
+			prepStmt.close();
+			conn.close();
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	return unfollowedUsers;
 }
 }

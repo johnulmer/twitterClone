@@ -22,42 +22,42 @@ public class User {
 		this.userID = userid;
 	}
 	public User(int userid) {
-		this.GetUserByID(userid);
+		this.getUserByID(userid);
 	}
 	public User() {
 	}
 	
 	//
-	public void Register() {
-		this.userID = TwitterDB.ProcessRegistration(this.getUserName(), this.getPassword(), this.getHandle());
+	public void register() {
+		this.userID = TwitterDB.processRegistration(this.getUserName(), this.getPassword(), this.getHandle());
 	}
-	public void Authenticate() {
-		this.userID = TwitterDB.Authenticate(this.userName, this.password);
-		this.handle = TwitterDB.GetUserHandle(this);
+	public void authenticate() {
+		this.userID = TwitterDB.authenticate(this.userName, this.password);
+		this.handle = TwitterDB.getUserHandle(this);
 	}
 	
 	// Mutator methods for Profile update page (can't update userName)
-	public void ChangeHandle(String newHandle) {
+	public void changeHandle(String newHandle) {
 		this.handle = newHandle;
 	}
-	public void ChangePassword(String newPassword) {
+	public void changePassword(String newPassword) {
 		this.password = newPassword;
 	}
 	
-	public ArrayList<User> GetFollowedUsers() {
-		return TwitterDB.FollowedUsers(this.userID);
+	public ArrayList<User> getFollowedUsers() {
+		return TwitterDB.followedUsers(this.userID);
 	}
 	
-	public ArrayList<User> GetUnfollowedUsers() {
-		return TwitterDB.UnfollowedUsers(this.userID);
+	public ArrayList<User> getUnfollowedUsers() {
+		return TwitterDB.unfollowedUsers(this.userID);
 	}
 	
-	private User GetUserByID(int userid) {
-		return TwitterDB.GetUserByUserID(userid);
+	private User getUserByID(int userid) {
+		return TwitterDB.getUserByUserID(userid);
 	}
 	
 	// Write user to DB
-	public void SaveUser() {
+	public void saveUser() {
 		// db logic here
 		String sqlString = "INSERT INTO Users (UserName, Password, Handle) VALUES (" 
 				+ this.userName + ", " + this.password + "," + this.handle + ")";
@@ -65,14 +65,14 @@ public class User {
 	}
 
 	// Register new user if neither username nor handle are in use
-	public String ValidNewUser() {
+	public String validNewUser() {
 		String returnString = "";
-		if (TwitterDB.GetUserByHandle(this.handle) != -1) {
+		if (TwitterDB.getUserByHandle(this.handle) != -1) {
 			returnString = "Handle exists, you are a copycat.";
-		} else if (TwitterDB.GetUserByUserName(this.userName) != -1) {
+		} else if (TwitterDB.getUserByUserName(this.userName) != -1) {
 			returnString = "Sandra Bullock opposes your identity theft - try a different User Name.";
 		} else {
-			TwitterDB.ProcessRegistration(this.userName, this.password, this.handle);
+			TwitterDB.processRegistration(this.userName, this.password, this.handle);
 			returnString = "SUCCESS";
 		}
 		return returnString;
@@ -88,7 +88,7 @@ public class User {
 	public String getHandle() {
 		return this.handle;
 	}
-	public int GetUserID() {
+	public int getUserID() {
 		return this.userID;
 	}
 }

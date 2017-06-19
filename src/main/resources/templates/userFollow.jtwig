@@ -4,34 +4,34 @@
 <body>
   {% include "header.jtwig" ignore missing %}
 <h2>Follow / Unfollow tester page</h2>
+<button id="btnToggle" showStatus="Followed">Show users I follow.</button>
 <div id=divUsers>
 </div>
-<button id="btnShowUnfollowedUsers">Users I do not follow.</button>
-<button id="btnAlreadyFollowing">Users I follow.</button>
 <div id="responseMsg"></div>
 <script>
 
-		btnShowUnfollowedUsers = document.getElementById("btnShowUnfollowedUsers");
-    btnShowUnfollowedUsers = document.getElementById("btnShowUnfollowedUsers");
+		btnToggle = document.getElementById("btnToggle");
     divUsers = document.getElementById("divUsers");
     divResponseMsg = document.getElementById("responseMsg");
 
-btnShowUnfollowedUsers.addEventListener('click', function (evt) {
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', '/showUnfollowedUsers');
-  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-  xhr.onload = function() {
-      if (xhr.status === 200) {
-            divUsers.innerHTML = xhr.responseText;
-      } else if (xhr.status !== 200) {
-          alert('Request failed.  Returned status of ' + xhr.status);
-      }
-  };
-  xhr.send();
-});
-  btnAlreadyFollowing.addEventListener('click', function (evt) {
+btnToggle.addEventListener('click', function (evt) {
+  if (btnToggle.getAttribute("showStatus") == "Followed") {
+    //change status to UnFollowed
+    btnToggle.setAttribute("showStatus", "unFollowed");
+    //change text to Show users I follow
+    btnToggle.innerHTML="Show users I follow.";
+    // update display of users to show unfollowed users
+    pathString = "showUnFollowedUsers";
+  } else {
+    //change status to Followed
+    btnToggle.setAttribute("showStatus", "Followed");
+    //change text to Show users I follow
+    btnToggle.innerHTML="Show users I do not follow.";
+    // update display of users to show followed users
+    pathString = "showFollowedUsers";
+  }
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', '/showFollowedUsers');
+    xhr.open('GET', '/' + pathString);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.onload = function() {
         if (xhr.status === 200) {
