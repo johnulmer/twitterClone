@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>testing javascript</title>
+  </head>
+  <body>
+    <div id=divItems>
+      <p>some text just to break things up</p>
+      <button userid="1">words</button>
+
+        <p>some text just to break things up</p>
+        <button userid="2">words</button>
+
+          <p>some text just to break things up</p>
+          <button userid="3">words</button>
+
+            <p>some text just to break things up</p>
+            <button userid="4">words</button>
+    </div>
+    <script>
+    var divItems = document.getElementById("divItems");
+    divItems.addEventListener('click', function (evt) {
+      if (event.target == "[object HTMLButtonElement]") {
+      alert(event.target.getAttribute("userid") + " click");
+    }
+    });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+<h2>Users who are not followed</h2>
+<img src="images/unfollow.jpg">
+<div id="UnFollowedList">
+{% for u in userlist %}
+<div userid="div{{u.userID}}">
+    <ul>
+        <li><button userid="div{{u.userID}}">Follow {{u.handle}}</button></li>
+    </ul>
+</div>
+{% endfor %}
+</div>
+<script>
+var divUnFollowedList = document.getElementById("UnFollowedList");
+divUnFollowedList.addEventListener('click', function (evt) {
+  if (evt.target.getAttribute("userid")) {
+    alert(evt.target.getAttribute("userid") + " click");
+}
+});
+</script>

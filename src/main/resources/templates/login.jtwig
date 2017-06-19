@@ -3,7 +3,8 @@
 <head>
 </head>
 <body>
-	<h1>Please log in to TwitterClone&trade;</h1>
+	  {% include "header.jtwig" ignore missing %}
+	<h2>Please log in and start or continue tweeting!</h2>
 	<table><tr><td>
 		<label id="lblUserName">User Name: </label><input type="text" id="txtUserName"></input><br/>
 		<label id="lblPassword">Password: </label><input type="password" id="txtPassword"></input><br/>
