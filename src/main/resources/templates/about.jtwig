@@ -1,0 +1,17 @@
+{% include "header.jtwig" ignore missing %}
+{% include "menu.jtwig" ignore missing %}
+	<h2>Twitter Clone Project</h2>
+<p>This site was created by <a href="mailto:ravi.bhupathiraju@libertymutual.com">Ravi Kumar Bhupathiraju</a> 
+& <a href="mailto:john.ulmer@libertymutual.com" target="_blank">John Ulmer</a> 
+for the <a href="http://www.theironyard.com">Iron Yard</a> 
+Java Training (Summer 2017). The site demonstrates the following concepts:</p>
+<table>
+<tr><th>Topic</th><th>Status</th><th>Demonstrated by:</th></tr>
+<tr><td>Class / data modeling</td><td>Complete</td><td>Site controller & model logic</td></tr>
+<tr><td>Associative entities</td><td>In progress</td><td>User / followers, Tweets / Likes</td></tr>
+<tr><td>Logical and physical deletes</td><td>Not started</td><td>Follow / unfollow / block</td></tr>
+<tr><td>Agile development & planning</td><td>In progress</td><td>Use of Trello for Kanban board</td></tr>
+</table>
+<img src="images/unfollow.jpg">
+		</body>
+		</html>

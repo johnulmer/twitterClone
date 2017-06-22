@@ -1,0 +1,10 @@
+<h2>These users I follow </h2>
+<div class="quoteblock">"Follow your instincts. That's where true wisdom manifests itself." - The Oprah</div>
+{% for u in userlist %}
+<div>
+    <ul>
+        <li>{{u.handle}} <button userid="{{u.userID}}">Unfollow!</button></li>
+    </ul>
+</div>
+{% endfor %}
+

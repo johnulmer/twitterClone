@@ -19,20 +19,41 @@ import spark.Response;
 public class TwitterRouter {
 	
 	private static void setSession(Request request, User u) {
-        request.session().attribute("userID", u.getUserID());
-        request.session().attribute("username", u.getUserName());
-        request.session().attribute("handle", u.getHandle());
+		request.session().attribute("user", u);
 	}
+	
+	// check session for every page in site except for log in page
+	private static void checkSession(Request request) {
+		User u = (User) request.session().attribute("user");
+		if (u != null) {
+		System.out.println("Page: " + request.url() + "     User: " + u.getUserName() + "   ID: " + u.getUserID());
+		}
+		// TODO change from void to boolean, check session(user.userID), return false if not greater than -1
+		// return (u.getUserID() >= 0);
+	}
+	
+	// present log in page with include used for heading
 	private static String logIn(Request request, Response response) {
         JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/login.jtwig");
         JtwigModel model = JtwigModel.newModel();
         return template.render(model);
 	}
+	
+	// present info about project, with include used for heading & menu
+	private static String about(Request request, Response response) {
+		checkSession(request);
+        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/about.jtwig");
+        JtwigModel model = JtwigModel.newModel();
+        return template.render(model);
+	}
+	
+	// check username and password to ensure valid user
 	private static String authenticate(Request request, Response response) {
         User u = new User(request.queryParams("username"), 
         		request.queryParams("password"), 
-        		request.queryParams("handle"));
-    	u.authenticate();
+        		"",
+        		-1);
+    	u = u.authenticate();
     	if (u.getUserID() > -1) {
     		setSession(request, u);
     		return "SUCCESS";
@@ -40,6 +61,7 @@ public class TwitterRouter {
     		return "Unable to authenticate - please try again or register if you are a new user.";
     	}
 	}
+	// attempt to process registration for new site user or return message re: username or handle already in use
 	private static String register(Request request, Response response) {
         User u = new User(request.queryParams("username"), 
         		request.queryParams("password"), 
@@ -51,110 +73,214 @@ public class TwitterRouter {
         }
     	return registration;
 	}
+	//  retrieve a User from session, display user update page
 	private static String updateUser(Request request, Response response) {
-    	User u = new User(Integer.parseInt(request.session().attribute("userID")));
+		checkSession(request);
+    	User u = (User) (request.session().attribute("user"));
         JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/userUpdate.jtwig");
         JtwigModel model = JtwigModel.newModel().with("user", u);
         return template.render(model);
 	}
+	// retrieve a User from session & new password and handle from request, process if valid
+	private static String processUpdateUser(Request request, Response response) {
+    	String returnString = "";
+		User u = (User) (request.session().attribute("user"));
+    	returnString = u.updateUser(request.queryParams("password"), request.queryParams("handle"));
+    	if (returnString.equals("SUCCESS")) {
+    		setSession(request, u);
+    		response.redirect("/userFollow");
+    		return "";
+    	} else {
+    		return "returnString";
+    	}
+	}
+    //TO FOLLOW:
+    // present page shell for users who are NOT followed
+	//return userFollow(request, response);
+
+    // return the specific list of users NOT followed by the logged in User
+	// showUnFollowedUsers(request, response);
+
+    // handle request to follow a specific user
+    // followThisUser(request, response);
+	
+	// retrieve a User from session, show all users NOT followed by that User
 	private static String userFollow(Request request, Response response) {
+		checkSession(request);
 	    JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/userFollow.jtwig");
 	    JtwigModel model = JtwigModel.newModel();
 	    return template.render(model);
 	}
-    
-	private static String showFollowedUsers(Request request, Response response) {
-    	User u = new User(2);  // hard-coded for testing, will add session checking later
-    	ArrayList<User> followedUsers = u.getFollowedUsers();
-        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/FollowedUserDisplay.jtwig");
-        JtwigModel model = JtwigModel.newModel().with("userlist", followedUsers);
-        System.out.println(template.render(model));
-        return template.render(model);
-	}
+	// retrieve a User from session, show other users not followed by that user
 	private static String showUnFollowedUsers(Request request, Response response) {
-		User u = new User(2);  // hard-coded for testing, will add session checking later
+    	User u = (User) (request.session().attribute("user"));
 		ArrayList<User> unfollowedUsers = u.getUnfollowedUsers();
-	    JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/UnFollowedUserDisplay.jtwig");
+	    JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/UsersIDoNotFollow.jtwig");
 	    JtwigModel model = JtwigModel.newModel().with("userlist", unfollowedUsers);
-	    System.out.println(template.render(model));
 	    return template.render(model);
 	}
+	// retrieve a User from session & userID from request, follow that User
+	private static String followThisUser(Request request, Response response) {
+		int userToFollow = Integer.parseInt(request.queryParams("userid"));
+		User u = (User) (request.session().attribute("user"));
+		u.followUser(userToFollow);
+		return "";
+	}
+	
+    /* TO STOP FOLLOWING:
+    // present page of users currently followed
+    // userStopFollowing(request, response);
 
-  
+    // return the specific list of users who ARE followed by the logged in User
+    // showFollowedUsers(request, response);
 
-	private static String tweetReply(spark.Request request, spark.Response response) {
-		int vtweetID = Integer.parseInt(request.queryParams("vtweetID"));
-		int vuserID = Integer.parseInt(request.queryParams("vuserID"));
-		vuserID = 2; // RAVI, this needs to be removed
-		String vtweetReply = request.queryParams("vtweetReply");
-		try {
-			Tweet insertReply = new Tweet();
-			insertReply.connect();
-			insertReply.insertReply(vtweetID, vuserID, vtweetReply);
-			return "success";
-		} catch (NumberFormatException ex) {
-			System.out.println("bad input");
-		}
-		return "failure";
-	};
+    // handle request to STOP following a specific user
+    // stopFollowingThisUser(request, response); */
 
-	private static String getTweet(spark.Request request, spark.Response response) {
-		System.out.println("begin getMainHTML");
-		Tweet getTweet = new Tweet();
-		getTweet.connect();
-		ArrayList<String> tweetList = new ArrayList<String>();
-		tweetList = getTweet.get(1, "main"); // returns tweetList
-		System.out.println(tweetList);
-		JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/getTweet.jtwig");
-		// JtwigTemplate.fileTemplate("c:/");
-		JtwigModel model = JtwigModel.newModel().with("tweets", tweetList);
-		return template.render(model);
-	};
+	// retrieve a User from session, show all users who ARE followed by that User
+	private static String userStopFollowing(Request request, Response response) {
+		checkSession(request);
+	    JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/userStopFollow.jtwig");
+        JtwigModel model = JtwigModel.newModel();
+	    return template.render(model);
+	}	
+	
+	// retrieve a User from session, show other users who ARE followed by that user
+	private static String showFollowedUsers(Request request, Response response) {
+    	User u = (User) (request.session().attribute("user"));
+    	ArrayList<User> followedUsers = u.getFollowedUsers();
+        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/UsersIFollow.jtwig");
+        JtwigModel model = JtwigModel.newModel().with("userlist", followedUsers);
+        return template.render(model);
+	}
+	
+	// retrieve a User from session & userID from request, STOP following that User
+	private static String stopFollowingThisUser(Request request, Response response) {
+		int userToStopFollowing = Integer.parseInt(request.queryParams("userid"));
+		User u = (User) (request.session().attribute("user"));
+		u.stopFollowingUser(userToStopFollowing);
+		return "";
+	}
+	
+    //TO BLOCK:
+    // show users currently following
+    // showFollowers(request, response);
+	
+    // handle request to block a specific user
+	// blockFollower(request, response);
+    
+	// retrieve a User from the session & show the users following that user
+	private static String showFollowers(Request request, Response response) {
+    	User u = (User) (request.session().attribute("user"));
+    	ArrayList<User> followedUsers = u.getFollowers(u.getUserID());
+        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/UsersFollowingMe.jtwig");
+        JtwigModel model = JtwigModel.newModel().with("userlist", followedUsers);
+        //System.out.println(template.render(model));
+        return template.render(model);
+	}
+	
+	// retrieve a User from session & userID from request, block that User
+	private static String blockFollower(Request request, Response response) {
+		int userToBlock = Integer.parseInt(request.queryParams("userIDtoBlock"));
+    	String returnString = "following userID but not committing: " + userToBlock;
+		User u = (User) (request.session().attribute("user"));
+		u.blockUser(userToBlock);
+		return returnString;
+	}
 
-	private static String insertTweet(spark.Request request, spark.Response response) {
-		System.out.print("/insertTweet post req 1 ");
-		String first = request.queryParams("tweetMessage");
-		System.out.print("/insertTweet post req 2 ");
-		try {
-			Tweet insertTweet = new Tweet();
-			insertTweet.connect();
-			insertTweet.insert(12, first, 1, "");
-			System.out.print("/insertTweet post req 3 ");
-			return "success";
-		} catch (NumberFormatException ex) {
-			System.out.println("bad input");
-		}
-		System.out.print("/insertTweet post req 4 ");
-		return "failure";
-	};
+	//RAVI CODE STARTS
 
-	// IN PROGRESS HERE
-	private static String getreplies(spark.Request request, spark.Response response) {
-		// private static String getreplies(spark.Request request,
-		// spark.Response response) {
-		System.out.println("begin getreplies");
-		System.out.println(request.queryParams("rtweetID"));
-		int rtweetID = Integer.parseInt(request.queryParams("rtweetID"));
-		// int rtweetID = 1;
-		TweetReplies getreply = new TweetReplies();
-		getreply.connect();
-		ArrayList<String> replylist = new ArrayList<String>();
-		// replylist = getreply.getreply(1); // returns tweetList
-		replylist = getreply.getreply(rtweetID); // returns tweetList
-		System.out.println(replylist);
-		// JtwigTemplate template =
-		// JtwigTemplate.classpathTemplate("templates/getTweet.jtwig");
-		// JtwigTemplate.fileTemplate("c:/");
-		// JtwigModel model = JtwigModel.newModel().with("replies", replylist);
-		// return replylist;
-		// return template.render(model);
-		// return replylist;
-		Gson gson = new Gson();
-		return gson.toJson(replylist);
-	};
+		// USED
+		private static String tweetReply(Request request, Response response) {
+			checkSession(request);
+			int tweetID = Integer.parseInt(request.queryParams("tweetID"));
+			int userID = Integer.parseInt(request.queryParams("userID"));
+			System.out.println("tweetID "+ tweetID);
+			//userID = 2; // RAVI, this needs to be removed
 
+			String tweetReply = request.queryParams("tweetReply");
+			System.out.println("tweetReply "+ tweetReply);
+			try {
+				Tweet insertReply = new Tweet();
+				insertReply.connect();
+				insertReply.insertReply(tweetID, userID, tweetReply);
+				return "success";
+			} catch (NumberFormatException ex) {
+				System.out.println("bad input");
+			}
+			return "failure";
+		};
+
+		// USED
+		private static String getTweet(Request request, Response response) {
+			Tweet getTweet = new Tweet();
+			getTweet.connect();
+			ArrayList<Tweet> tweetList = getTweet.get(1, "main"); // returns
+																	// tweetList
+			JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/enterTweet.jtwig");
+			JtwigModel model = JtwigModel.newModel().with("tweets", tweetList);
+			return template.render(model);
+		};
+
+		// USED
+		private static String getTweets(Request request, Response response) {
+			Tweet getTweet = new Tweet();
+			getTweet.connect();
+			ArrayList<Tweet> tweetList = getTweet.get(1, "main"); // returns
+																	// tweetList
+			JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/tweets.jtwig");
+			JtwigModel model = JtwigModel.newModel().with("tweets", tweetList);
+			return template.render(model);
+		};
+
+		// USED
+		private static String insertTweet(spark.Request request, spark.Response response) {
+			String first = request.queryParams("tweetMessage");
+			try {
+				Tweet insertTweet = new Tweet();
+				insertTweet.connect();
+				insertTweet.insert(12, first, 1, "");
+				return "success";
+			} catch (NumberFormatException ex) {
+				System.out.println("bad input");
+			}
+			return "failure";
+		};
+
+		// USED
+		private static String getreplies(spark.Request request, spark.Response response) {
+			int tweetID = Integer.parseInt(request.queryParams("tweetID"));
+			System.out.println("tweetID "+tweetID);
+			TweetReplies getreply = new TweetReplies();
+			getreply.connect();
+			ArrayList<String> replylist = new ArrayList<String>();
+			replylist = getreply.getreply(tweetID); // returns tweetList
+			System.out.println("replylist "+replylist);
+			Gson gson = new Gson();
+			return gson.toJson(replylist);
+		};
+
+		// USED
+		private static String tweetLike(spark.Request request, spark.Response response) {
+			checkSession(request);
+			int tweetID = Integer.parseInt(request.queryParams("tweetID"));
+			int userID = Integer.parseInt(request.queryParams("userID"));
+			//userID = 2; // RAVI, this needs to be removed
+
+			try {
+				Likes addLike = new Likes();
+				addLike.connect();
+				addLike.addLike(tweetID, userID);
+				return "success";
+			} catch (NumberFormatException ex) {
+				System.out.println("bad input");
+			}
+			return "failure";
+		};
+
+	//RAVI CODE ENDS
 	  public static void main(String[] args) {
-	        port(3007);
+	        port(3000);
 	        staticFiles.location("/public");
 	        
 	        // show log in, auth, register.  login page is a template because it needs to handle header include
@@ -167,40 +293,77 @@ public class TwitterRouter {
 	        post("/register", (request, response) -> {
 	        	return register(request, response);
 	        });
+	        get("/about", (request, response) -> {
+	        	return about(request, response);
+	        });
+	        get("/logout", (request, response) -> {
+	        	request.session().removeAttribute("user");
+	        	response.redirect("/login");
+	        	return "";
+	        });
 	        
-	        // user maint pages - handle / password changes, TODO add block other users
+	        // user maint pages - handle / password changes, block other users
 	        get("/userUpdate", (request, response) -> {
 	        	return updateUser(request, response);
 	        });
+	        get("/update", (request, response) -> {
+	        	return processUpdateUser(request, response);
+	        });
 	        
 	        // actions related to following (show all, follow, unfollow)
+	        //TO FOLLOW:
+	        // present page shell for users who are NOT followed
 	        get("/userFollow", (request, response) -> {
 	        	return userFollow(request, response);
 	        });
+	        // return the specific list of users NOT followed by the logged in User
 	        get("/showUnFollowedUsers", (request, response) -> {
 	        	return showUnFollowedUsers(request, response);
-	        });   
+	        }); 
+	        // handle request to follow a specific user
+	        post("/followThisUser", (request, response) -> {
+	        	return followThisUser(request, response);
+	        });
+	        
+	        //TO STOP FOLLOWING:
+	        // present page of users currently followed
+	        get("/userStopFollowing", (request, response) -> {
+	        	return userStopFollowing(request, response);
+	        });
+	        // return the specific list of users who ARE followed by the logged in User
 	        get("/showFollowedUsers", (request, response) -> {
 	        	return showFollowedUsers(request, response);
 	        }); 
+	        // handle request to STOP following a specific user
+	        post("/stopFollowingThisUser", (request, response) -> {
+	        	return stopFollowingThisUser(request, response);
+	        });
 	        
+	        //TO BLOCK:
+	        // show users currently following
+	        get("/showFollowers", (request, response) -> {
+	        	return showFollowers(request, response);
+	        });
+	        // handle request to block a specific user
+	        post("/blockFollower", (request, response) -> {
+	        	return blockFollower(request, response);
+	        });
 	        
-			// get handler for getting the tweets for the user
-			get("/insertTweet", (request, response) -> {
-				JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/enterTweet.jtwig");
-				JtwigModel model = JtwigModel.newModel();
-				return template.render(model);
-			});
-
-
+	      //RAVI CODE STARTS
 			// Post handler for storing the tweet to DB
 			post("/insertTweet", (request, response) -> {
 				return TwitterRouter.insertTweet(request, response);
 			});
 
-			// Gets all the tweets for the user
+			// This is the main tweets messages..does
+			// 1) provides insert tweets option and 2) gets all existing tweets
 			get("/getTweetHTML", (request, response) -> {
 				return TwitterRouter.getTweet(request, response);
+			});
+
+			// Gets all the tweets for the user
+			get("/getTweets", (request, response) -> {
+				return TwitterRouter.getTweets(request, response);
 			});
 
 			// Inserts replies against the tweets into DB
@@ -221,17 +384,13 @@ public class TwitterRouter {
 				JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/login.jtwig");
 				JtwigModel model = JtwigModel.newModel();
 				return template.render(model);
-			});    
-	        
-	        //request to get own tweet + followers tweet        	
-	        get("/getMainTweet", (request, response) -> {
-	        	Tweet getTweet = new Tweet();
-	        	getTweet.connect();
-	        	System.out.println(getTweet.get(1,"main"));
-		        JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/login.jtwig");
-		        JtwigModel model = JtwigModel.newModel();
-		        return template.render(model);
-	        });		
-			        
+			});
+
+			// Inserts likes into DB
+			post("/like", (request, response) -> {
+				System.out.println("like post call begins");
+				return TwitterRouter.tweetLike(request, response);
+			});
+	//RAVI CODE ENDS   
 	}
 }

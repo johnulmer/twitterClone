@@ -1,0 +1,10 @@
+<h2>These users I am not following: </h2>
+<div class="quoteblock">"Too many kings can ruin an army." - Homer</div>
+{% for u in userlist %}
+<div>
+    <ul>
+        <li>{{u.handle}} <button userid="{{u.userID}}">Follow!</button></li>
+    </ul>
+</div>
+{% endfor %}
+

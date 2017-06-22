@@ -1,0 +1,10 @@
+<div style="align: center">
+<a href="">Timeline</a>	&#376;
+<a href="">My Tweets</a>	&#376;
+<a href="/userUpdate">My Info</a>	&#376;
+<a href="/userFollow">Follow Someone</a>	&#376;
+<a href="/userStopFollowing">Stop Following Someone</a>	&#376;
+<a href="">See Timelines</a>	&#376;
+<a href="/logout">Log Out</a>	&#376;
+<a href="/about">About</a>	&#376;
+</div>

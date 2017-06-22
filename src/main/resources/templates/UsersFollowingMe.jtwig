@@ -1,0 +1,10 @@
+<h2>These users follow me: </h2>
+<div class="quoteblock">"Our culture has gotten too mean and too rough, especially to children and teenagers." - M. Trump</div>
+{% for u in userlist %}
+<div userid="{{u.userID}}">
+    <ul>
+        <li>{{u.handle}} <button userid="{{u.userID}}">BLOCK</button></li>
+    </ul>
+</div>
+{% endfor %}
+

@@ -1,10 +1,5 @@
-<!DOCTYPE html>
-<html>
-<head>
-</head>
-<body>
-	  {% include "header.jtwig" ignore missing %}
-	<h2>Please log in and start or continue tweeting!</h2>
+{% include "header.jtwig" ignore missing %}
+<h2>Please log in and start or continue tweeting!</h2>
 	<table><tr><td>
 		<label id="lblUserName">User Name: </label><input type="text" id="txtUserName"></input><br/>
 		<label id="lblPassword">Password: </label><input type="password" id="txtPassword"></input><br/>
@@ -41,8 +36,7 @@
 					if (xhr.status === 200) {
 							var authResponse = xhr.responseText;
 							if (authResponse == "SUCCESS") {
-								window.location = "/userUpdate";
-								//window.location = "https://www.google.com/";
+								window.location = "/userFollow";
 							} else {
 							divResponseMsg.innerHTML = authResponse;
 						}

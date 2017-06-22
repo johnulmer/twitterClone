@@ -1,20 +1,33 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Tweet Message</title>
-</head>
-<body>
-<h2>Enter Tweet</h2>
+    {% include "header.jtwig" ignore missing %}
+    {% include "menu.jtwig" ignore missing %}
 <hr>
 <div>
     <div>
         <label for="textInputID">Tweet</label>
-        <input type="text" id="textInputID" size="140">
-
-        <br>
-        <p>Result:&nbsp;<span id="result"></span></p>
+        <input type="text" id="textInputID" size="140"
     </div>
+    <br>
     <button id="Tweet_button">Tweet</button>
+</div>
+
+<div id="tweets">
+
+    {% for t in tweets %}
+    <div>
+     {{t.tweet}} {{t.userName}} {{t.timeStamp}}
+    <button  btweetID={{t.tweetID}} >Reply</button>
+    <button  likeID={{t.tweetID}} >Like</button> <br />
+    <button  likeCountID={{t.tweetID}} >{{t.likeCount}}</button> <br />
+    <input type="text" id={{t.tweetID}} name="replytext" style="display: none;">
+    <div data-replyid=reply{{t.tweetID}} style="display: none;">
+    </div>
+    <div data-timeStampID=timeStamp{{t.tweetID}} style="display: none;">
+    </div>
+    <button  data-btweetID=button{{t.tweetID}} style="display: none;">Enter</button> <br />
+    <button  btweetID={{t.tweetID}} style="display: none;">Cancel</button> <br />
+    </div>
+    {% endfor %}
+
 </div>
 
 <script>
@@ -26,8 +39,7 @@ button.onclick = function () {
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.onload = function() {
         if (xhr.status === 200) {
-            var result = document.getElementById('result');
-            result.innerHTML = xhr.responseText;
+            refreshTweets();
         } else if (xhr.status !== 200) {
             alert('Request failed.  Returned status of ' + xhr.status);
         }
@@ -37,6 +49,160 @@ button.onclick = function () {
     console.log(body);
     xhr.send(body);
 };
+
+// code for getting the tweets
+
+function refreshTweets() {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', '/getTweets');
+  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      // document.getElementById('ShowButton').innerText = 'Show filter';
+      document.getElementById('tweets').innerHTML = xhr.responseText;
+      console.log("inserted tweets");
+      //ravi comehere
+      document.getElementById('textInputID').value = '';
+    } else if (xhr.status !== 200) {
+      divResponseMsg.innerHTML = "Request failed.  Returned status of " + xhr.status;
+    }
+  };
+  xhr.send();
+}
+
+refreshTweets();
+/*
+eventlistener when like button is pressed
+*/
+var likeClick = document.getElementById("tweets");
+likeClick.addEventListener('click', function (evt) {
+  if (event.target.getAttribute("likeID")) {
+    var likestring = "like" + event.target.getAttribute("likeID");
+    tweetID = event.target.getAttribute("likeID");
+    console.log(event.target.getAttribute(tweetID));
+    //ravi user id pending to be passed
+    // var tweetID = event.target.getAttribute("data-btweetID").substring(6);
+    likePostCall(tweetID);
+  }
+}
+);
+
+function likePostCall(tweetID){
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '/like');
+  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+    } else if (xhr.status !== 200) {
+      alert('Request failed.  Returned status of ' + xhr.status);
+    }
+  };
+  //Get Userid needs to be included....RAVI
+  var userID = 0;
+  console.log(tweetID);
+  console.log(document.getElementById(tweetID).value);
+  var body = 'tweetID=' + encodeURIComponent(tweetID) +
+  '&userID=' + encodeURIComponent(userID);
+  console.log(body);
+  xhr.send(body);
+}
+
+// code to process the reply after enter is clicked
+var enterb = document.getElementById("tweets");
+enterb.addEventListener('click', function (evt) {
+  if (event.target.getAttribute("data-btweetID")) {
+    console.log(event.target.getAttribute("data-btweetID"));
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/tweetReply');
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    var tweetID = event.target.getAttribute("data-btweetID").substring(6);
+    var tweetReply = (document.getElementById(tweetID).value);
+    document.getElementById(tweetID).value = '';
+    // IN PROGRESS
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        //ravi here timestamp needs to be included
+        var newReplyText = document.createElement('p');
+        var today = new Date();
+        var months = ['Jan', 'Feb', 'Mar', 'Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var currdate = months[today.getMonth()] +'  '+today.getDate();
+        var userID = "user2";    //ravi change userID logic here
+        newReplyText.innerText = tweetReply.concat("  ",userID," ",currdate);
+        var myDiv = document.querySelector(`div[data-replyid='${replystring}']`);
+        console.log("myDiv" + myDiv);
+        myDiv.insertBefore(newReplyText, myDiv.firstChild);
+        replyDiv.style.display = "block";
+        timeStampDiv.style.display = "block";
+      } else if (xhr.status !== 200) {
+        alert('Request failed.  Returned status of ' + xhr.status);
+      }
+    };
+    //Get Userid needs to be included....RAVI
+    var userID = 0;
+    console.log(tweetID);
+    console.log(document.getElementById(tweetID).value);
+    var body = 'tweetReply=' + encodeURIComponent(tweetReply) + '&tweetID=' + encodeURIComponent(tweetID) +
+    '&userID=' + encodeURIComponent(userID);
+    console.log(body);
+    xhr.send(body);
+  }
+})
+
+/*
+Event listenter code when reply button is clicked. Does 1) enabling reply text input on the page and 2) fetch all existing replies
+for the corresponding tweet message
+*/
+var replyClick = document.getElementById("tweets");
+replyClick.addEventListener('click', function (evt) {
+  if (event.target.getAttribute("btweetID")) {
+    replyButton = document.getElementById(event.target.getAttribute("btweetID"));
+    replyButton.style.display = "block";
+    var buttonstring = "button" + event.target.getAttribute("btweetID");
+    var enterButton = document.querySelector(`button[data-btweetID='${buttonstring}']`);
+    enterButton.style.display = "block";
+    replystring = "reply" + event.target.getAttribute("btweetID");
+    replyDiv = document.querySelector(`div[data-replyid='${replystring}']`);
+    timestampstring = "timeStamp" + event.target.getAttribute("btweetID");
+    timeStampDiv = document.querySelector(`div[data-timeStampID='${timestampstring}']`);
+    //the below two lines will delete existing replies tags that were already built
+    nodeReply = document.querySelector(`div[data-replyid='${replystring}']`);
+    nodeReply.innerHTML = '';
+    nodeTimeStamp = document.querySelector(`div[data-timeStampID='${timestampstring}']`);
+    nodeTimeStamp.innerHTML = '';
+    tweetID = event.target.getAttribute("btweetID");
+    getTweetsFunc();
+  }
+}
+);
+
+function getTweetsFunc(){
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', '/getreplies?tweetID=' + tweetID);
+  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      console.log("reply related logic starts here5");
+      response = JSON.parse(xhr.responseText);
+      for(var i = 0; i < response.length; i++) {
+        var newReplyDiv = document.createElement("div");
+        // var userName = response[i].userName;
+        var myDate = new Date(response[i].timeStamp);
+        var months = ['Jan', 'Feb', 'Mar', 'Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var replyLine = (response[i].replyText).concat( "     ",response[i].userName," ",months[myDate.getMonth()],"  ",myDate.getDate());
+        newReplyDiv.innerHTML = replyLine;
+        nodeReply.appendChild(newReplyDiv);
+
+        replyDiv.style.display = "block";
+        timeStampDiv.style.display = "block";
+
+      }
+    } else if (xhr.status !== 200) {
+      alert('Request failed.  Returned status of ' + xhr.status);
+    }
+  };
+  xhr.send();
+}
+
 </script>
 </body>
 </html>

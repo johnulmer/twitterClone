@@ -1,5 +1,4 @@
 <h2>I am not following: </h2>
-<table><tr><td>
 <div id="UnFollowedList">
 {% for u in userlist %}
 <div userid="div{{u.userID}}">
@@ -8,12 +7,6 @@
     </ul>
 </div>
 {% endfor %}
-</td>
-<td>
-<img src="images/unfollow.jpg">
-</td>
-</tr>
-</table>
 </div>
 <script>
 var divUnFollowedList = document.getElementById("UnFollowedList");

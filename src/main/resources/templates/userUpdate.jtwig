@@ -1,50 +1,122 @@
-<!DOCTYPE html>
-<html>
-<head>
-</head>
-<body>
-	<h1>Today I shall assume a new identity <i>TwitterClone&trade;!</i></h1>
-	<table><tr><td>
-		<div id="divUserName"><label id="lblUserName">User Name: </label>{{user.getUserName()}}</div><br/>
-		<label id="lblPassword">Password: </label><input type="text" id="txtPassword" value="{{user.getPassword()}}"></input><br/>
-		<label id="lblHandle">Handle: </label><input type="text" id="txtHandle" value="{{user.getHandle()}}"></input></td>
-		<td><button id="btnUpdate">Update</button> handle or password.</td>
-			</tr>
-			<tr><td colspan="2"><div id="responseMsg"></div></td>
-		</table>
+{% include "header.jtwig" ignore missing %}
+{% include "menu.jtwig" ignore missing %}
+<h2>User Update for {{user.getUserName()}}</h2>
+<h3>Change your password, change your handle, or block away!</h3>
+
+
+<div id="passwordUpdate" class="dataform">
+<label id="lblPassword" class="datalabel">Password: </label><input type="password" id="txtPassword"></input>
+<label id="lblConfirmPassword" class="datalabel">Confirm Password: </label><input type="password" id="txtConfirmPassword"></input>
+<button id="btnUpdatePassword">Change Password</button>
+</div>
+
+<div id="handleUpdate"class="dataform">
+<label id="lblHandle" class="datalabel">Current Handle: </label><label class="datavalue"> {{user.getHandle()}} </label>
+<label id="lblHandle" class="datalabel">New Handle: </label><input type="text" id="txtHandle" value=""></input>
+<button id="btnUpdateHandle">Change Handle</button>
+</div>
+
+<div id="responseMsg"></div>
+<div id="divFollowers"></div>
 		<script>
 
 		// attach code to UI elements
-		btnUpdate = document.getElementById("btnUpdate");
+		btnUpdatePassword = document.getElementById("btnUpdatePassword");
+		btnUpdateHandle = document.getElementById("btnUpdateHandle");
 		divUserName = document.getElementById("divUserName");
 		txtPassword = document.getElementById("txtPassword");
+		txtConfirmPassword = document.getElementById("txtConfirmPassword");
 		txtHandle = document.getElementById("txtHandle");
-		divResponseMsg = document.getElementById("responseMsg");
-		divResponseMsg.innerHTML = "did i get a session? " + '@Session["handle"]';
 
-//get login form data, send to authenticate method
-		btnUpdate.addEventListener('click', function (evt) {
+		divResponseMsg = document.getElementById("responseMsg");
+		divFollowers = document.getElementById("divFollowers");
+		
+		//get update form data, send to userUpdate method
+btnUpdatePassword.addEventListener('click', function (evt) {
+	var password = txtPassword.value;
+	var confirmPassword = txtConfirmPassword.value;
+	if (password == "") {
+		divResponseMsg = "Password field may not be null - please enter a value.";
+	} else if (confirmPassword == "") {
+		divResponseMsg = "Confirm password field may not be null - please enter a value.";
+	} else if (password != confirmPassword) {
+		divResponseMsg = "Password & confirm password fields must match - please try again.";
+	} else {
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', '/update');
+		xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		xhr.onload = function() {
+			if (xhr.status === 200) {
+				var authResponse = xhr.responseText;
+				if (authResponse != "SUCCESS") {
+					divResponseMsg.innerHTML = authResponse;
+				}
+			} else if (xhr.status !== 200) {
+				divResponseMsg.innerHTML = "Request failed.  Returned status of " + xhr.status;
+			}
+		};
+// keep working on update method here - separating password and handle logic		
+		
+		var body = 'handle=' + encodeURIComponent(handle) + '&password=' + encodeURIComponent(password);
+		xhr.send(body);
+	}
+});
+
+//get update form data, send to userUpdate method
+btnUpdate.addEventListener('click', function (evt) {
+	var handle = txtHandle.value;
+	var password = txtPassword.value;
+	if ((handle != "") && (password != "")) {
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', '/update');
+		xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		xhr.onload = function() {
+			if (xhr.status === 200) {
+				var authResponse = xhr.responseText;
+				if (authResponse != "SUCCESS") {
+					divResponseMsg.innerHTML = authResponse;
+				}
+			} else if (xhr.status !== 200) {
+				divResponseMsg.innerHTML = "Request failed.  Returned status of " + xhr.status;
+			}
+		};
+		var body = 'handle=' + encodeURIComponent(handle) + '&password=' + encodeURIComponent(password);
+		xhr.send(body);
+	}
+});
+
+		divFollowers.addEventListener('click', function (evt) {
+			if (event.target == "[object HTMLButtonElement]") {
 			var xhr = new XMLHttpRequest();
-			xhr.open('POST', '/update');
+			xhr.open('POST', '/blockFollower');
 			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 			xhr.onload = function() {
 					if (xhr.status === 200) {
-							var authResponse = xhr.responseText;
-							if (authResponse == "SUCCESS") {
-								window.location = "https://www.google.com/";
-							} else {
-							divResponseMsg.innerHTML = authResponse;
-						}
+							refreshFollowers();
 					} else if (xhr.status !== 200) {
-							alert('Request failed.  Returned status of ' + xhr.status);
+							divResponseMsg.innerHTML = "Request failed.  Returned status of " + xhr.status;
 					}
 			};
-			var handle = txtHandle.value;
-			var password = txtPassword.value;
-			var body = 'handle=' + encodeURIComponent(handle) + '&password=' + encodeURIComponent(password);
-			console.log(body);
+			var body = 'userIDtoBlock=' + encodeURIComponent(event.target.getAttribute("userid"));
 			xhr.send(body);
+			}
 		});
+
+		window.onload = refreshFollowers();
+
+		function refreshFollowers() {
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET', '/showFollowers');
+			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+			xhr.onload = function() {
+					if (xhr.status === 200) {
+							divFollowers.innerHTML = xhr.responseText;
+					} else if (xhr.status !== 200) {
+							divResponseMsg.innerHTML = "Request failed.  Returned status of " + xhr.status;
+					}
+			};
+			xhr.send();
+		}
 
 		</script>
 		</body>

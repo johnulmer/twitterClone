@@ -1,23 +1,23 @@
 {% include "header.jtwig" ignore missing %}
 {% include "menu.jtwig" ignore missing %}
-<div id="divUnFollowedUsers">
+<div id="divFollowedUsers">
 </div>
 
 <div id="responseMsg"></div>
 <script>
-    var divUnFollowedUsers = document.getElementById("divUnFollowedUsers");
+    var divFollowedUsers = document.getElementById("divFollowedUsers");
     var divResponseMsg = document.getElementById("responseMsg");
 
-    divUnFollowedUsers.addEventListener('click', function (evt) {
+    divFollowedUsers.addEventListener('click', function (evt) {
       if (evt.target.getAttribute("userid")) {
         //alert("got a click");
         alert(evt.target.getAttribute("userid") + " click");
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', '/followThisUser');
+        xhr.open('POST', '/stopFollowingThisUser');
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xhr.onload = function() {
             if (xhr.status === 200) {
-            	refreshUnfollowed();
+            	refreshFollowed();
                 divResponseMsg.innerHTML = xhr.responseText;
             } else if (xhr.status !== 200) {
                 alert('Request failed.  Returned status of ' + xhr.status);
@@ -29,15 +29,15 @@
     }
     });
     
-    		window.onload = refreshUnfollowed();
+    		window.onload = refreshFollowed();
 
-		function refreshUnfollowed() {
+		function refreshFollowed() {
 			var xhr = new XMLHttpRequest();
-			xhr.open('GET', '/showUnFollowedUsers');
+			xhr.open('GET', '/showFollowedUsers');
 			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 			xhr.onload = function() {
 					if (xhr.status === 200) {
-							divUnFollowedUsers.innerHTML = xhr.responseText;
+							divFollowedUsers.innerHTML = xhr.responseText;
 					} else if (xhr.status !== 200) {
 							divResponseMsg.innerHTML = "Request failed.  Returned status of " + xhr.status;
 					}

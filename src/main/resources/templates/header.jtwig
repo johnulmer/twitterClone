@@ -1,5 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="TwitterClone.css">
+</head>
+<body>
 <header>
-<table><tr>
+<table style="text-align: center; horizontal-align: middle"><tr>
 <td><img src="images/leftbirds.jpg"></td>
 <td style="text-align: center"><h1> TwitterClone&trade; </h1>
 <p><i>We're the Rutger Hauer<br/>of social media.</i></p></td>

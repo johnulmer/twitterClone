@@ -11,26 +11,30 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 public class Tweet {
 	int tweetID;
 	String tweet;
-	int timeStamp;
-	String tserID;
+	String timeStamp;
+	String userName;
 	String replyText;
+	int likeCount;
 
-	public Tweet(int TweetID, String Tweet, int TimeStamp, String UserID) {
+	public Tweet(int TweetID, String Tweet, String TimeStamp, String userName,int likeCount) {
 		this.tweetID = TweetID;
 		this.tweet = Tweet;
 		this.timeStamp = TimeStamp;
-		this.tserID = UserID;
+		this.userName = userName;
+		this.likeCount=likeCount;
 	}
 
 	Tweet() {
 
 	}
-	
 
+//	USED
 	public void insert(int TweetID, String Tweet, int UserID, String Image) {
 
 		LocalDateTime TimeStamp = LocalDateTime.now();
@@ -49,6 +53,7 @@ public class Tweet {
 		}
 	}
 
+//	USED
 	// Method to insert replies against a tweet
 	public void insertReply(int tweetID, int userID, String replyText) {
 
@@ -57,7 +62,6 @@ public class Tweet {
 		String sql = "INSERT INTO Replies(TweetID,UserID,TimeStamp,ReplyText) VALUES(?,?,?,?)";
 		System.out.println("sql stmt1 " + sql);
 		try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-			System.out.println("sql stmt2 " + sql);
 			pstmt.setDouble(1, tweetID);
 			pstmt.setDouble(2, userID);
 			pstmt.setString(3, date);
@@ -67,18 +71,19 @@ public class Tweet {
 			System.out.println(e.getMessage());
 		}
 	}
-
-	//this method is for getting tweets
-	public ArrayList<String> get(int userID, String get) {
-		ArrayList tweetList = new ArrayList();
+	
+	//USED
+	// this method is for getting tweets
+	public ArrayList<Tweet> get(int userID, String get) {
+		ArrayList<Tweet> tweetList = new ArrayList<Tweet>();
 
 		String sql;
 		String resText = "";
 		if (get == "self") {
-			sql = "SELECT Tweet FROM Tweets where UserID=" + userID;
+			sql = "SELECT Tweet FROM Tweets where UserID=" + userID + "order by TimeStamp desc" ;
 		} else {
 			sql = "SELECT * FROM Tweets where UserID in "
-					+ "(select FollowedByUserID from Followers where FollowedUserID =" + userID + ")";
+					+ "(select FollowedByUserID from Followers where FollowedUserID =" + userID + ")" + "order by TimeStamp desc";
 		}
 		// System.out.println(sql);
 		try (Connection conn = this.connect();
@@ -86,7 +91,24 @@ public class Tweet {
 				ResultSet rs = stmt.executeQuery(sql)) {
 			// loop through the result set
 			while (rs.next()) {
-				Tweet t = new Tweet(rs.getInt("TweetID"), rs.getString("Tweet"), rs.getInt("UserID"), "");
+				User u = new User(rs.getInt("UserID"));
+				userName = u.getUserName();
+				SimpleDateFormat formatter, FORMATTER;
+				formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+				String oldDate = rs.getString("TimeStamp");
+				Date date;
+				try {
+						date = formatter.parse(oldDate.substring(0, 23));
+						FORMATTER = new SimpleDateFormat("MMM d");
+						timeStamp=FORMATTER.format(date);
+					} catch (ParseException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+//				getLikeCount();
+				Likes likeClass = new Likes();
+				int likeCount = likeClass.getLikeCount(rs.getInt("TweetID"));
+				Tweet t = new Tweet(rs.getInt("TweetID"), rs.getString("Tweet"),timeStamp ,userName,likeCount);
 				tweetList.add(t);
 			}
 		} catch (SQLException e) {
@@ -97,6 +119,7 @@ public class Tweet {
 		return tweetList;
 	}
 
+//	USED
 	public Connection connect() {
 		// SQLite connection string
 		String url = TwitterDB.DBURL;

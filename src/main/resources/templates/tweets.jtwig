@@ -1,0 +1,13 @@
+{% for t in tweets %} {{t.tweet}} {{t.userName}} {{t.timeStamp}}
+<button  btweetID={{t.tweetID}} >Reply</button>
+<button  likeID={{t.tweetID}} >Like</button>
+<span  likeCountID={{t.tweetID}} >{{t.likeCount}} </span> <br />
+</div>
+<input type="text" id={{t.tweetID}} name="replytext" style="display: none;">
+<div data-replyid=reply{{t.tweetID}} style="display: none;">
+</div>
+<div data-timeStampID=timeStamp{{t.tweetID}} style="display: none;">
+</div>
+<button  data-btweetID=button{{t.tweetID}} style="display: none;">Enter</button> <br />
+<button  btweetID={{t.tweetID}} style="display: none;">Cancel</button> <br />
+{% endfor %}

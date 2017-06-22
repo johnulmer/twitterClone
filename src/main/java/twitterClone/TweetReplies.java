@@ -15,33 +15,38 @@ import java.sql.Statement;
 public class TweetReplies {
 	int tweetID;
 	String tweet;
-	int timeStamp;
+	String timeStamp;
 	String tserID;
 	String replyText;
+	String userName;
 
-	public TweetReplies(String replytext) {
+	public TweetReplies(String replytext, String timeStamp, String userName) {
 		this.replyText = replytext;
+		this.timeStamp = timeStamp;
+		this.userName = userName;
 	}
 
 	TweetReplies() {
 
 	}
 	
-
-	// in progress here RAVI
+//USED
 	public ArrayList<String> getreply(int tweetID) {
 		ArrayList replylist = new ArrayList();
 
 		String sql;
 		String resText = "";
-		sql = "SELECT ReplyText FROM Replies where TweetID=" + tweetID;
+		//ravi comehere
+		sql = "SELECT ReplyText, TimeStamp, UserID  FROM Replies where TweetID=" + tweetID + " order by TimeStamp desc";
 		// System.out.println(sql);
 		try (Connection conn = this.connect();
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sql)) {
 			// loop through the result set
 			while (rs.next()) {
-				TweetReplies t = new TweetReplies(rs.getString("ReplyText"));
+				User u = new User(rs.getInt("UserID"));
+				userName = u.getUserName();
+				TweetReplies t = new TweetReplies(rs.getString("ReplyText"),rs.getString("TimeStamp"),userName);
 				replylist.add(t);
 			}
 		} catch (SQLException e) {
@@ -52,6 +57,7 @@ public class TweetReplies {
 		return replylist;
 	}
 
+//	USED
 	public Connection connect() {
 		// SQLite connection string
 		String url = TwitterDB.DBURL;

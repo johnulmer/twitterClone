@@ -1,0 +1,131 @@
+body {
+  background-color: #ffffff;
+  color:  #2a1c29;
+  font-family:  Gill Sans, Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  margin: 0;
+}
+
+a {
+  color: #fe853b;
+}
+
+h1 {
+  font-size: 36px;
+  margin: 0;
+}
+
+h2 {
+  font-size: 22px;
+  margin-top: 60px;
+}
+
+h3 {
+  font-size: 20px;
+  font-weight: normal;
+  margin-top: 60px;
+}
+
+h4 {
+  color: #fe853b;
+  font-size: 15px;
+  font-weight: normal;
+  margin: 0 0 10px 0;
+}
+
+p {
+  color: #6f6f6f;
+  font-family: Helvetica, Arial, sans-serif;
+  line-height: 29px;
+  margin: 8px 0;
+}
+
+.header {
+  background-color: #ffaf2d;
+  background-image: url('http://tiy-hostable-assets.s3.amazonaws.com/porcelain-cat/images/header-background.jpg');
+  background-position: center center;
+  background-repeat: no-repeat;
+  padding: 20px;
+  text-align: center;
+}
+
+.header img {
+  margin-bottom: 30px;
+}
+
+.header nav a {
+  border-bottom: 2px solid #fe853b;
+  color: #2a1c29;
+  margin: 0 8px;
+  padding: 5px 8px;
+  text-decoration: none;
+}
+
+.header nav a:hover {
+  background: #fe853b;
+}
+
+.header nav a.active {
+  background: #ffffff;
+}
+
+.intro {
+  background: #efefef;
+  padding: 50px;
+  text-align: center;
+}
+
+.about {
+  margin: 40px auto;
+  width: 600px;
+}
+
+.about .call-out {
+  margin: 50px 0;
+  background: #fe853b;
+  border-radius: 7px;
+  padding: 20px 30px;
+}
+
+.about .call-out h2 {
+  margin-top: 20px;
+}
+
+.about .call-out p {
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 34px;
+}
+
+.about .left-picture {
+  float: left;
+  margin: 10px 40px 10px 0;
+}
+
+.about .right-picture {
+  float: right;
+  margin: 10px 0 10px 40px;
+}
+
+.about ol {
+  border-left: 5px solid #fe853b;
+  margin: 30px 0;
+  padding: 0 40px;
+}
+
+.about li {
+  font-size: 18px;
+  font-style: italic;
+  line-height: 30px;
+}
+
+.about strong {
+  color: #2a1c29;
+}
+
+.footer {
+  background: #2a1c29;
+  color: #846281;
+  padding: 10px 0 50px 0;
+  text-align: center;
+}
