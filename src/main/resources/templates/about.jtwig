@@ -1,17 +1,39 @@
 {% include "header.jtwig" ignore missing %}
 {% include "menu.jtwig" ignore missing %}
 	<h2>Twitter Clone Project</h2>
-<p>This site was created by <a href="mailto:ravi.bhupathiraju@libertymutual.com">Ravi Kumar Bhupathiraju</a> 
-& <a href="mailto:john.ulmer@libertymutual.com" target="_blank">John Ulmer</a> 
-for the <a href="http://www.theironyard.com">Iron Yard</a> 
+<p>This site was created by <a href="mailto:ravi.bhupathiraju@libertymutual.com">Ravi Kumar Bhupathiraju</a>
+& <a href="mailto:john.ulmer@libertymutual.com" target="_blank">John Ulmer</a>
+for the <a href="http://www.theironyard.com">Iron Yard</a>
 Java Training (Summer 2017). The site demonstrates the following concepts:</p>
-<table>
-<tr><th>Topic</th><th>Status</th><th>Demonstrated by:</th></tr>
-<tr><td>Class / data modeling</td><td>Complete</td><td>Site controller & model logic</td></tr>
-<tr><td>Associative entities</td><td>In progress</td><td>User / followers, Tweets / Likes</td></tr>
-<tr><td>Logical and physical deletes</td><td>Not started</td><td>Follow / unfollow / block</td></tr>
-<tr><td>Agile development & planning</td><td>In progress</td><td>Use of Trello for Kanban board</td></tr>
-</table>
+
+<dl>
+
+  <dt><strong>Class / Data Modeling</strong></dt>
+  <dd>Classes include Tweet, User, as well as classes to support data implementation.</dd>
+<br/>
+  <dt><strong>Web Application Framework</strong></dt>
+  <dd>The <a href="http://sparkjava.com/">SPARK</a> web application framework was used to handle requests and responses for the web application.</dd>
+<br/>
+  <dt><strong>Server Side Templating</strong></dt>
+  <dd>The <a href="http://jtwig.org/">JTWIG</a> templating framework was used to create all pages dynamically on the server.</dd>
+ <br/>
+  <dt><strong>Logical and Physical Deletes</strong></dt>
+  <dd>Follow / unfollow / block:  Follow and Unfollow are physical deletes, but
+	block is a logical delete so the user is no longer shown but the following relationship is preserved.</dd>
+ <br/>	
+  <dt><strong>Agile development & planning</strong></dt>
+  <dd><a href="http://trello.com/">Trello</a> was used to create a Kanban board.</dd>
+ <br/>	
+  <dt><strong>Associative Entities</strong></dt>
+  <dd>Shown in the relationships between User & followers, Tweets & Likes</dd>
+</dl>
+
+
+
+
+
+
+
 <img src="images/unfollow.jpg">
 		</body>
 		</html>
