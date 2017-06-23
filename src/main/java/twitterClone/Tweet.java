@@ -34,7 +34,6 @@ public class Tweet {
 
 	}
 
-//	USED
 	public void insert(String Tweet, int UserID, String Image) {
 
 		LocalDateTime TimeStamp = LocalDateTime.now();
@@ -54,7 +53,6 @@ public class Tweet {
 	}
 
 
-//	USED
 	// Method to insert replies against a tweet
 	public void insertReply(int tweetID, int userID, String replyText) {
 
@@ -73,8 +71,6 @@ public class Tweet {
 		}
 	}
 
-//	RAVI NEW CHANGES START
-	//USED
 	// this method is for getting tweets
 	public ArrayList<Tweet> get(int userID, String reqType) {
 		ArrayList<Tweet> tweetList = new ArrayList<Tweet>();
@@ -86,14 +82,12 @@ public class Tweet {
 			sql = "SELECT * FROM Tweets where UserID in "
 					+ "(select FollowedUserID from Followers where FollowedByUserID =" + userID + " AND BlockFollowingUser IS NULL )" + " order by TimeStamp desc";
 		}
-//		RAVI NEW CHANGES END
 		 System.out.println(sql);
 		try (Connection conn = this.connect();
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sql)) {
 			// loop through the result set
 			while (rs.next()) {
-//ravi changes userID thing not working, check with John
 				User u = new User(rs.getInt("UserID"));
 				userName = u.getUserName();
 				SimpleDateFormat formatter, FORMATTER;
