@@ -1,0 +1,3 @@
+{% for u in userlist %}
+<option value="{{u.userID}}">{{u.handle}}</option>
+{% endfor %}

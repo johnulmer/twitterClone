@@ -63,7 +63,7 @@ public static int processRegistration(String userName, String password, String h
 		conn = connect();
 		prepStmt = conn.prepareStatement("INSERT INTO Users (UserName, Password, Handle) VALUES (?, ?, ?)");
 		prepStmt.setString(1, userName);
-		prepStmt.setString(2, pwdHash(password));
+		prepStmt.setString(2, password);
 		prepStmt.setString(2, handle);
 		prepStmt.executeUpdate();
        } catch (SQLException e) {
@@ -94,15 +94,15 @@ private static String pwdHash(String plainTextPassword) {
 	return returnString;
 }
 
-// update a user's username and password based on UserID match
-public static void updateUser(int userID, String password, String handle) {
+// update a user's handle based on UserID match
+public static void updateHandle(int userID, String handle) {
 	Connection conn = null;
 	PreparedStatement prepStmt = null;
+	System.out.println("userID: " + userID + " handle: " + handle);
 	try {
 		conn = connect();
-		prepStmt = conn.prepareStatement("UPDATE Users SET Password = ?, Handle = ? WHERE UserID = ?");
-		prepStmt.setString(1, password);
-		prepStmt.setString(2, handle);
+		prepStmt = conn.prepareStatement("UPDATE Users SET Handle = ? WHERE UserID = ?");
+		prepStmt.setString(1, handle);
 		prepStmt.setInt(2, userID);
 		prepStmt.executeUpdate();
        } catch (SQLException e) {
@@ -115,6 +115,29 @@ public static void updateUser(int userID, String password, String handle) {
 				System.out.println(e.getMessage());
 			}
        }
+}
+
+//update a user's password based on UserID match
+public static void updatePassword(int userID, String password) {
+	Connection conn = null;
+	PreparedStatement prepStmt = null;
+	System.out.println("userID: " + userID + " password: " + password);
+	try {
+		conn = connect();
+		prepStmt = conn.prepareStatement("UPDATE Users SET Password = ? WHERE UserID = ?");
+		prepStmt.setString(1, password);
+		prepStmt.setInt(2, userID);
+		prepStmt.executeUpdate();
+    } catch (SQLException e) {
+        System.out.println(e.getMessage());
+    } finally {
+			try {
+				prepStmt.close();
+				conn.close();
+			} catch (SQLException e) {
+				System.out.println(e.getMessage());
+			}
+    }
 }
 
 //Read user from DB by userID

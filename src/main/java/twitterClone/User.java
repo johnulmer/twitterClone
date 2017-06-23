@@ -48,12 +48,12 @@ public class User {
 	}
 	
 	// Mutator methods for Profile update page (can't update userName)
-	public void changeHandle(String newHandle) {
-		this.handle = newHandle;
-	}
-	public void changePassword(String newPassword) {
-		this.password = newPassword;
-	}
+//	public void changeHandle(String newHandle) {
+//		this.handle = newHandle;
+//	}
+//	public void changePassword(String newPassword) {
+//		this.password = newPassword;
+//	}
 	public ArrayList<User> getFollowers(int userID) {
 		return TwitterDB.myFollowers(userID);
 	}
@@ -69,12 +69,20 @@ public class User {
 		return TwitterDB.getUserByUserID(userid);
 	}
 
-	public String updateUser(String newHandle, String newPassword) {
+	public String updateHandle(String newHandle) {
 		String returnString = "";
 		if (TwitterDB.getUserByHandle(newHandle) != -1) {
 			returnString = "I'm sorry, that handle is already in use.";
 		} else if (TwitterDB.getUserByUserName(this.userName) != -1) {
-			TwitterDB.updateUser(this.userID, newPassword, newHandle);
+			TwitterDB.updateHandle(this.userID, newHandle);
+			returnString = "SUCCESS";
+		}
+		return returnString;
+	}
+	public String updatePassword(String newPassword) {
+		String returnString = "";
+		if (TwitterDB.getUserByUserName(this.userName) != -1) {
+			TwitterDB.updatePassword(this.userID, newPassword);
 			returnString = "SUCCESS";
 		}
 		return returnString;

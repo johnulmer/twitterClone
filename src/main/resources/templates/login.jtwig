@@ -36,7 +36,7 @@
 					if (xhr.status === 200) {
 							var authResponse = xhr.responseText;
 							if (authResponse == "SUCCESS") {
-								window.location = "/userFollow";
+								window.location = "/getTweetHTML";
 							} else {
 							divResponseMsg.innerHTML = authResponse;
 						}
@@ -71,7 +71,7 @@
 					if (xhr.status === 200) {
 							var authResponse = xhr.responseText;
 							if (authResponse == "SUCCESS") {
-								window.location = "https://www.google.com/";
+								window.location = "/getTweetHTML";
 							} else {
 							divResponseMsg.innerHTML = authResponse;
 						}

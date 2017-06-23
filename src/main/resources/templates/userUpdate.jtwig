@@ -1,6 +1,6 @@
 {% include "header.jtwig" ignore missing %}
 {% include "menu.jtwig" ignore missing %}
-<h2>User Update for {{user.getUserName()}}</h2>
+<h2>User Update for <span id="spanHandle">{{user.getHandle()}}</h2>
 <h3>Change your password, change your handle, or block away!</h3>
 
 
@@ -31,56 +31,59 @@
 		divResponseMsg = document.getElementById("responseMsg");
 		divFollowers = document.getElementById("divFollowers");
 		
-		//get update form data, send to userUpdate method
-btnUpdatePassword.addEventListener('click', function (evt) {
-	var password = txtPassword.value;
-	var confirmPassword = txtConfirmPassword.value;
-	if (password == "") {
-		divResponseMsg = "Password field may not be null - please enter a value.";
-	} else if (confirmPassword == "") {
-		divResponseMsg = "Confirm password field may not be null - please enter a value.";
-	} else if (password != confirmPassword) {
-		divResponseMsg = "Password & confirm password fields must match - please try again.";
+//get handle update data, send to userUpdate method
+btnUpdateHandle.addEventListener('click', function (evt) {
+	var handle = txtHandle.value;
+	if (handle == "") {
+			divResponseMsg.innerHTML = "ERROR:  Handle field may not be null - please enter a value.";
 	} else {
 		var xhr = new XMLHttpRequest();
-		xhr.open('POST', '/update');
+		xhr.open('POST', '/updateHandle');
 		xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 		xhr.onload = function() {
 			if (xhr.status === 200) {
 				var authResponse = xhr.responseText;
 				if (authResponse != "SUCCESS") {
-					divResponseMsg.innerHTML = authResponse;
+					divResponseMsg.innerHTML = "ERROR:  " + authResponse;
+				} else {
+					divResponseMsg.innerHTML = "SUCCESS! Your handle has been updated to: " + handle;
 				}
 			} else if (xhr.status !== 200) {
 				divResponseMsg.innerHTML = "Request failed.  Returned status of " + xhr.status;
 			}
 		};
-// keep working on update method here - separating password and handle logic		
-		
-		var body = 'handle=' + encodeURIComponent(handle) + '&password=' + encodeURIComponent(password);
+		var body = 'handle=' + encodeURIComponent(handle);
 		xhr.send(body);
 	}
 });
-
-//get update form data, send to userUpdate method
-btnUpdate.addEventListener('click', function (evt) {
-	var handle = txtHandle.value;
+		
+//get password update data, send to userUpdate method
+btnUpdatePassword.addEventListener('click', function (evt) {
 	var password = txtPassword.value;
-	if ((handle != "") && (password != "")) {
+	var confirmPassword = txtConfirmPassword.value;
+	if ((password == null) || (password == "")) {
+		divResponseMsg.innerHTML = "ERROR:  Password field may not be null - please enter a value.";
+	} else if (confirmPassword == "") {
+		divResponseMsg.innerHTML = "ERROR:  Confirm password field may not be null - please enter a value.";
+	} else if (password != confirmPassword) {
+		divResponseMsg.innerHTML = "ERROR:  Password & confirm password fields must match - please try again.";
+	} else {
 		var xhr = new XMLHttpRequest();
-		xhr.open('POST', '/update');
+		xhr.open('POST', '/updatePassword');
 		xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 		xhr.onload = function() {
 			if (xhr.status === 200) {
 				var authResponse = xhr.responseText;
 				if (authResponse != "SUCCESS") {
-					divResponseMsg.innerHTML = authResponse;
+					divResponseMsg.innerHTML = "ERROR:  " + authResponse;
+				} else {
+					divResponseMsg.innerHTML = "Your password has been updated.  If you have forgotten to what it has been updated, please upgrade to TwitterClone Premium and contact support!";
 				}
 			} else if (xhr.status !== 200) {
 				divResponseMsg.innerHTML = "Request failed.  Returned status of " + xhr.status;
 			}
-		};
-		var body = 'handle=' + encodeURIComponent(handle) + '&password=' + encodeURIComponent(password);
+		};	
+		var body = '&password=' + encodeURIComponent(password);
 		xhr.send(body);
 	}
 });

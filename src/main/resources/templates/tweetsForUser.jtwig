@@ -1,0 +1,102 @@
+{% include "header.jtwig" ignore missing %}
+{% include "menu.jtwig" ignore missing %}
+<h2>Show tweets for a particular user</h2>
+<div> Pick a user you follow: 
+<select id="selFollowedUsers" onchange="getFollowedUserTimeline()">
+<option value="-1">No user selected</option>
+</select></div>
+<div> Or one you don't: 
+<select id="selNOTFollowedUsers" onchange="getNOTFollowedUserTimeline()">
+<option value="-1">No user selected</option>
+</select>
+</div>
+<div id="divTweetDisplay">
+</div>
+
+<div id="responseMsg"></div>
+
+		<script>
+		// attach code to UI elements
+		selFollowedUsers = document.getElementById("selFollowedUsers");
+		selNOTFollowedUsers = document.getElementById("selNOTFollowedUsers");
+		divTweetDisplay = document.getElementById("divTweetDisplay");
+		divResponseMsg = document.getElementById("responseMsg");
+		
+//		selFollowedUsers.addEventListener("change", getFollowedUserTimeline());
+//		selNOTFollowedUsers.addEventListener("change", getNOTFollowedUserTimeline());
+		
+		function getNOTFollowedUserTimeline() {
+			var xhr = new XMLHttpRequest();
+			var userID = selNOTFollowedUsers.options[selNOTFollowedUsers.selectedIndex].value;
+			if (userID != -1) {
+			xhr.open('GET', '/getUserTimeline?reqType=OWN&userID=' + userID);
+			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+			xhr.onload = function() {
+					if (xhr.status === 200) {
+							divTweetDisplay.innerHTML = xhr.responseText;
+					} else if (xhr.status !== 200) {
+							divResponseMsg.innerHTML = "Request failed.  Returned status of " + xhr.status;
+					}
+			};
+			xhr.send();
+			}
+		}
+		
+		function getFollowedUserTimeline() {
+			var xhr = new XMLHttpRequest();
+			var userID = selFollowedUsers.options[selFollowedUsers.selectedIndex].value;
+			if (userID != -1) {
+			xhr.open('GET', '/getUserTimeline?reqType=OWN&userID=' + userID);
+			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+			xhr.onload = function() {
+					if (xhr.status === 200) {
+							divTweetDisplay.innerHTML = xhr.responseText;
+					} else if (xhr.status !== 200) {
+							divResponseMsg.innerHTML = "Request failed.  Returned status of " + xhr.status;
+					}
+			};
+			xhr.send();
+			}
+		}
+		
+
+			
+
+ window.onload = refreshBoth();
+
+function refreshBoth() {
+	refreshFollowedUsersSelect();
+	refreshNOTFollowedUsersSelect();
+}
+
+function refreshFollowedUsersSelect() {
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET', '/showFollowersSelect');
+			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+			xhr.onload = function() {
+					if (xhr.status === 200) {
+							selFollowedUsers.innerHTML += xhr.responseText;
+					} else if (xhr.status !== 200) {
+							divResponseMsg.innerHTML = "Request failed.  Returned status of " + xhr.status;
+					}
+			};
+			xhr.send();
+}
+function refreshNOTFollowedUsersSelect() {
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET', '/showNOTFollowersSelect');
+			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+			xhr.onload = function() {
+					if (xhr.status === 200) {
+							selNOTFollowedUsers.innerHTML += xhr.responseText;
+					} else if (xhr.status !== 200) {
+							divResponseMsg.innerHTML = "Request failed.  Returned status of " + xhr.status;
+					}
+			};
+			xhr.send();
+}
+
+
+		</script>
+		</body>
+		</html>

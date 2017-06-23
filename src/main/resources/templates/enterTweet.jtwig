@@ -16,7 +16,9 @@
     <div>
      {{t.tweet}} {{t.userName}} {{t.timeStamp}}
     <button  btweetID={{t.tweetID}} >Reply</button>
-    <button  likeID={{t.tweetID}} >Like</button> <br />
+<!-- ravi change starts here -->
+    <button  likeID={{t.tweetID}} >Like</button>
+<!-- ravi change ends here -->
     <button  likeCountID={{t.tweetID}} >{{t.likeCount}}</button> <br />
     <input type="text" id={{t.tweetID}} name="replytext" style="display: none;">
     <div data-replyid=reply{{t.tweetID}} style="display: none;">
@@ -39,7 +41,19 @@ button.onclick = function () {
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.onload = function() {
         if (xhr.status === 200) {
-            refreshTweets();
+            console.log("hostname", window.location.href);
+            var domainstring = window.location.href.toString();
+            console.log(domainstring);
+            if (domainstring.includes('Own')) {
+              console.log("true");
+              var reqType = "own";
+            }
+            console.log(domainstring);
+            // if (window.location.href).includes("Own") {
+            //   console.log("own");
+            // }
+            // window.location.
+            refreshTweets(reqType);
         } else if (xhr.status !== 200) {
             alert('Request failed.  Returned status of ' + xhr.status);
         }
@@ -52,9 +66,13 @@ button.onclick = function () {
 
 // code for getting the tweets
 
-function refreshTweets() {
+function refreshTweets(reqType) {
   var xhr = new XMLHttpRequest();
-  xhr.open('GET', '/getTweets');
+  // ravi changes start
+  // xhr.open('GET', '/getTweets');
+  xhr.open('GET', '/getTweets?reqType=' + reqType);
+  // xhr.open('GET', '/getreplies?tweetID=' + tweetID);
+  // ravi changes end
   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   xhr.onload = function() {
     if (xhr.status === 200) {
@@ -70,7 +88,9 @@ function refreshTweets() {
   xhr.send();
 }
 
-refreshTweets();
+// ravi change starts here
+// refreshTweets();
+// ravi change ends here
 /*
 eventlistener when like button is pressed
 */

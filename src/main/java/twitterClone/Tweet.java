@@ -35,7 +35,7 @@ public class Tweet {
 	}
 
 //	USED
-	public void insert(int TweetID, String Tweet, int UserID, String Image) {
+	public void insert(String Tweet, int UserID, String Image) {
 
 		LocalDateTime TimeStamp = LocalDateTime.now();
 		String date = TimeStamp.toString();
@@ -52,6 +52,7 @@ public class Tweet {
 			System.out.println(e.getMessage());
 		}
 	}
+
 
 //	USED
 	// Method to insert replies against a tweet
@@ -71,26 +72,28 @@ public class Tweet {
 			System.out.println(e.getMessage());
 		}
 	}
-	
+
+//	RAVI NEW CHANGES START
 	//USED
 	// this method is for getting tweets
-	public ArrayList<Tweet> get(int userID, String get) {
+	public ArrayList<Tweet> get(int userID, String reqType) {
 		ArrayList<Tweet> tweetList = new ArrayList<Tweet>();
-
-		String sql;
+		String sql="";
 		String resText = "";
-		if (get == "self") {
-			sql = "SELECT Tweet FROM Tweets where UserID=" + userID + "order by TimeStamp desc" ;
-		} else {
+		if (reqType == "own") {
+			sql = "SELECT * FROM Tweets where UserID=" + userID + " order by TimeStamp desc" ;
+		} else if (reqType == "main") {
 			sql = "SELECT * FROM Tweets where UserID in "
-					+ "(select FollowedByUserID from Followers where FollowedUserID =" + userID + ")" + "order by TimeStamp desc";
+					+ "(select FollowedUserID from Followers where FollowedByUserID =" + userID + " AND BlockFollowingUser IS NULL )" + " order by TimeStamp desc";
 		}
-		// System.out.println(sql);
+//		RAVI NEW CHANGES END
+		 System.out.println(sql);
 		try (Connection conn = this.connect();
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(sql)) {
 			// loop through the result set
 			while (rs.next()) {
+//ravi changes userID thing not working, check with John
 				User u = new User(rs.getInt("UserID"));
 				userName = u.getUserName();
 				SimpleDateFormat formatter, FORMATTER;
