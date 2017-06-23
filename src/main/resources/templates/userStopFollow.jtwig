@@ -11,7 +11,7 @@
     divFollowedUsers.addEventListener('click', function (evt) {
       if (evt.target.getAttribute("userid")) {
         //alert("got a click");
-        alert(evt.target.getAttribute("userid") + " click");
+        //alert(evt.target.getAttribute("userid") + " click");
         var xhr = new XMLHttpRequest();
         xhr.open('POST', '/stopFollowingThisUser');
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');

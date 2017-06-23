@@ -9,7 +9,7 @@ Java Training (Summer 2017). The site demonstrates the following concepts:</p>
 <dl>
 
   <dt><strong>Class / Data Modeling</strong></dt>
-  <dd>Classes include Tweet, User, as well as classes to support data implementation.</dd>
+  <dd>Classes include Tweet, User, Reply, as well as classes to support data implementation.</dd>
 <br/>
   <dt><strong>Web Application Framework</strong></dt>
   <dd>The <a href="http://sparkjava.com/">SPARK</a> web application framework was used to handle requests and responses for the web application.</dd>
@@ -21,8 +21,8 @@ Java Training (Summer 2017). The site demonstrates the following concepts:</p>
   <dd>Follow / unfollow / block:  Follow and Unfollow are physical deletes, but
 	block is a logical delete so the user is no longer shown but the following relationship is preserved.</dd>
  <br/>	
-  <dt><strong>Agile development & planning</strong></dt>
-  <dd><a href="http://trello.com/">Trello</a> was used to create a Kanban board.</dd>
+  <dt><strong>Agile Development & Planning</strong></dt>
+  <dd><a href="http://trello.com/">Trello</a> was used to create a Kanban board.  The team held daily scrums and used pair programming.</dd>
  <br/>	
   <dt><strong>Associative Entities</strong></dt>
   <dd>Shown in the relationships between User & followers, Tweets & Likes</dd>

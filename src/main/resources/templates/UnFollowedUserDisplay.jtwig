@@ -11,9 +11,9 @@
 <script>
 var divUnFollowedList = document.getElementById("UnFollowedList");
 divUnFollowedList.addEventListener('click', function (evt) {
-  alert("got a click");
+//  alert("got a click");
   if (evt.target.getAttribute("userid")) {
-    alert(evt.target.getAttribute("userid") + " click");
+//    alert(evt.target.getAttribute("userid") + " click");
 }
 });
 </script>
